@@ -1,15 +1,12 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: SSMClientToolsSetup
 
-on:
-   workflow_dispatch
-     
+on: workflow_dispatch
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -20,4 +17,4 @@ jobs:
       - run: npm ci
       - run: npm start
     env:
-       MY_TOKEN: ${{ secrets.MY_TOKEN }}
+      MY_TOKEN: ${{ secrets.MY_TOKEN }}

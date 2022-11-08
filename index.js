@@ -1,4 +1,9 @@
-import  {main} from "@digicert/ssm-client-tools-installer";
+import { main } from "@digicert/ssm-client-tools-installer";
+import * as core from "@actions/core";
 
-
-const result=await main("keyoair-signing")
+try {
+  const result = await main("keypair-signing");
+  core.setOutput("Result", result);
+} catch (error) {
+  core.setFailed(error.message);
+}
