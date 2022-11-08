@@ -3,13 +3,10 @@
 
 name: Node.js CI
 
-on:
-   workflow_dispatch
-     
+on: workflow_dispatch
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -20,4 +17,4 @@ jobs:
       - run: npm ci
       - run: npm start
     env:
-       MY_TOKEN: ${{ secrets.MY_TOKEN }}
+      MY_TOKEN: ${{ secrets.MY_TOKEN }}

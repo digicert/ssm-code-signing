@@ -3,7 +3,10 @@ import * as core from "@actions/core";
 
 try {
   const result = await main("keypair-signing");
-  core.setOutput("Result", result);
+
+  !result
+    ? core.setOutput("Result", "Success")
+    : core.setFailed("Installation failed");
 } catch (error) {
   core.setFailed(error.message);
 }
