@@ -1,5 +1,5 @@
 ---
-name: ''
+name: 'Secure Software Manager'
 description: 'Secure Software Manager client tools extension is a streamlined keypair-based signing workflow that improves software security and seamlessly integrates with DevOps processes to sign binaries on a variety of platforms. '
 author: 'DigiCert'
 runs:
