@@ -4,7 +4,7 @@
 name: Node.js CI
 
 on:
-   workflow_dispatch
+   push
      
 
 jobs:
@@ -20,4 +20,4 @@ jobs:
       - run: npm ci
       - run: npm start
     env:
-       MY_TOKEN: ${{ secrets.MY_TOKEN }}
+       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
