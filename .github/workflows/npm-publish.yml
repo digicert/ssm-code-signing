@@ -20,5 +20,6 @@ jobs:
       - run: npm i
       - run: npm ci
       - run: npm start
+      - run: echo "$result" 
     env:
        SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
