@@ -1,6 +1,6 @@
 ---
-name: "Secure Software Manager"
-description: "Secure Software Manager client tools extension is a streamlined keypair-based signing workflow that improves software security and seamlessly integrates with DevOps processes to sign binaries on a variety of platforms. "
+name: "Code Signing With Secure Software Manager"
+description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
 author: "DigiCert"
 runs:
   using: "node16"
