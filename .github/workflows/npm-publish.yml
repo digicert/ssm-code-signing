@@ -21,13 +21,13 @@ jobs:
       - name: Client tools installation
         id: installer
         run: |
-         npm ci
-         npm start
+          npm ci
+          npm start
       - name: verify installation
         run: |
-         echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
-         cd "${{ steps.installer.outputs.extractpath }}"
-         echo "Tools installed are ..."
-         dir   
+          echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
+          cd "${{ steps.installer.outputs.extractpath }}"
+          echo "Tools installed are ..."
+          dir
     env:
       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
