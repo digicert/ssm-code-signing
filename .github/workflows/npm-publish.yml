@@ -18,7 +18,16 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm ci
-      - run: npm start
+      - name: Client tools installation
+        id: installer
+        run: |
+         npm ci
+         npm start
+      - name: verify installation
+        run: |
+         echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS!!_CONFIG}}"
+         cd "${{ steps.installer.outputs.extractpath }}"
+         echo "Tools installed are ..."
+         ls -a 
     env:
       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
