@@ -25,7 +25,7 @@ jobs:
          npm start
       - name: verify installation
         run: |
-         echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS!!_CONFIG}}"
+         echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
          cd "${{ steps.installer.outputs.extractpath }}"
          echo "Tools installed are ..."
          ls -a 
