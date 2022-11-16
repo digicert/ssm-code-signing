@@ -23,14 +23,14 @@ jobs:
         run: |
          npm ci
          npm start
-      - if: matrix.os=='ubuntu-latest' && {{steps.installer.outputs.Result}}=='Success'   
+      - if: matrix.os=='ubuntu-latest' && ${{steps.installer.outputs.Result}}=='Success'   
         name: verify installation
         run: |
          echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
          cd "${{ steps.installer.outputs.extractpath }}"
          echo "Tools installed are ..."
          ls -a 
-      - if: matrix.os=='windows-latest' && {{steps.installer.outputs.Result}}=='Success' 
+      - if: matrix.os=='windows-latest' && ${{steps.installer.outputs.Result}}=='Success' 
         name: verify installation
         run: |
          echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
