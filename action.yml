@@ -1,7 +1,6 @@
 ---
 name: "Code Signing With Secure Software Manager"
 description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
-author: "DigiCert"
 runs:
   using: "node16"
   main: "index.js"
