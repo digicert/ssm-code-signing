@@ -1,5 +1,5 @@
 ---
-name: "Code Signing With Secure Software Manager"
+name: "Code Signing with Secure Software Manager"
 description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
 runs:
   using: "node16"

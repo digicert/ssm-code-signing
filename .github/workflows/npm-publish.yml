@@ -19,12 +19,12 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Client tools installation
+      - name: Install Secure Software Manager client tools
         id: installer
         run: |
           npm ci
           npm start
-      - name: verify installation
+      - name: Verify installation
         run: |
           echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
           cd "${{ steps.installer.outputs.extractpath }}"
