@@ -20,14 +20,14 @@ jobs:
         with:
           node-version: 16
       - name: Install Secure Software Manager client tools
-        id: installer
+        id: SSMClientToolsSetup
         run: |
           npm ci
           npm start
       - name: Verify installation
         run: |
-          echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
-          cd "${{ steps.installer.outputs.extractpath }}"
+          echo "The PKCS11 is installed @${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
+          cd "${{ steps.SSMClientToolsSetup.outputs.extractpath }}"
           echo "Tools installed are ..."
           dir
     env:
