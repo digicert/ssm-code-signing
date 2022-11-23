@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 16
       - name: Install Secure Software Manager client tools
-        id: installer
+        id: SSMClientToolsSetup
         run: |
           npm ci
           npm start
