@@ -21,6 +21,6 @@
   "homepage": "https://github.com/digicert/ssm-github-actions#readme",
   "dependencies": {
     "@actions/core": "^1.10.0",
-    "@digicert/ssm-client-tools-installer": "^1.1.3"
+    "@digicert/ssm-client-tools-installer": "file:../../../Documents/GitHub/ssm-client-tools-installer/digicert-ssm-client-tools-installer-1.0.0.tgz"
   }
 }
