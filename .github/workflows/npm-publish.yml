@@ -24,4 +24,4 @@ jobs:
           npm start
       - run: echo " the result is ${{steps.hello.outputs.Result}}"    
     env:
-       MY_TOKEN: ${{ secrets.MY_TOKEN }}
+       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
