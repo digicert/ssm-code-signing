@@ -4,7 +4,7 @@
 name: Node.js CI
 
 on:
-   workflow_dispatch
+   push
      
 
 jobs:
@@ -17,7 +17,11 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - run: npm ci
-      - run: npm start
+      - name: install tools 
+        id: hello
+        run: | 
+          npm ci
+          npm start
+      - run: echo " the result is ${{steps.hello.outputs.Result}}"    
     env:
        MY_TOKEN: ${{ secrets.MY_TOKEN }}
