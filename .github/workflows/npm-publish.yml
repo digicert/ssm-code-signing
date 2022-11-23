@@ -25,8 +25,8 @@ jobs:
           npm start
       - name: Verify installation
         run: |
-          echo "The PKCS11 is installed @${{steps.installer.outputs.PKCS11_CONFIG}}"
-          cd "${{ steps.installer.outputs.extractPath }}"
+          echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
+          cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
           echo "Tools installed are ..."
           dir
     env:
