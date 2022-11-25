@@ -29,8 +29,11 @@ const resolvedVersion="1.31.0"
     .catch((err:any) => {
      throw err;
     });
-   findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**","signtool")
- 
+  const foundfile= findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64","signtool")
+  if(foundfile){
+    core.addPath(foundfile)
+    tc.cacheDir(foundfile,"signtool","1.1.1")
+  }
 } catch (error:any) {
   core.setFailed(error.message);
 }
@@ -42,8 +45,10 @@ function findToolInPath(pathForTool: string, tool: string) {
    return  globber.glob()
   }).then((files:any)=>{
   console.log("***",files)
+  return files && files.length>0? files[0]:undefined;
   }).catch((err)=>{
     console.error("***",err);
   }
   )
+  return undefined;
 }
