@@ -27,7 +27,7 @@ try {
       }
     })
     .catch((err: any) => {
-      throw err;
+       throw err;
     });
   const foundfile = findToolInPath(
     "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64",

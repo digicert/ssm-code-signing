@@ -33630,7 +33630,7 @@ try {
         if (message) {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.addPath(message.imp_file_paths.extractPath);
-            tc.cacheDir(message.imp_file_paths.extractPath, 'smctl', resolvedVersion).then((response) => {
+            tc.cacheDir(message.imp_file_paths.extractPath, "smctl", resolvedVersion).then((response) => {
                 console.log("tools cache has been updated with the path:", response);
             });
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
@@ -33653,13 +33653,15 @@ catch (error) {
 }
 function findToolInPath(pathForTool, tool) {
     const patterns = `${pathForTool}\\${tool}.exe`;
-    globber.create(patterns)
+    globber
+        .create(patterns)
         .then((globber) => {
         return globber.glob();
-    }).then((files) => {
-        console.log("***", files);
+    })
+        .then((files) => {
         return files && files.length > 0 ? files[0] : undefined;
-    }).catch((err) => {
+    })
+        .catch((err) => {
         console.error("***", err);
     });
     return undefined;
