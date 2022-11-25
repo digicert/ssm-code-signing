@@ -29,7 +29,7 @@ const resolvedVersion="1.31.0"
     .catch((err:any) => {
      throw err;
     });
-   findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\**","signtool")
+   findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**","signtool")
  
 } catch (error:any) {
   core.setFailed(error.message);
