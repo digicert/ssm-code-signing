@@ -33651,12 +33651,14 @@ catch (error) {
     core.setFailed(error.message);
 }
 function findToolInPath(pathForTool, tool) {
-    const patterns = ['**/*.exe'];
-    glob_1.default.create(patterns.join('\n'))
+    const patterns = '**/*.exe';
+    glob_1.default.create(patterns)
         .then((globber) => {
         return globber.glob();
     }).then((files) => {
         console.log("***", files);
+    }).catch((err) => {
+        console.error("***", err);
     });
 }
 

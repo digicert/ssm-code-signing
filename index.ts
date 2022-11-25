@@ -36,12 +36,15 @@ const resolvedVersion="1.31.0"
 }
 
 function findToolInPath(pathForTool: string, tool: string) {
-  const patterns = ['**/*.exe']
-  glob.create(patterns.join('\n'))
+  const patterns = '**/*.exe'
+  glob.create(patterns)
   .then((globber:any)=>{
    return  globber.glob()
   }).then((files:any)=>{
   console.log("***",files)
-  })
+  }).catch((err)=>{
+    console.error("***",err);
+  }
+  )
   
 }
