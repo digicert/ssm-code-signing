@@ -3,7 +3,7 @@ name: "Code Signing with Secure Software Manager"
 description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
 runs:
   using: "node16"
-  main: "index.js"
+  main: "./build/index.js"
 branding:
   icon: "check-circle"
   color: "blue"

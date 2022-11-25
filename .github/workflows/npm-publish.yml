@@ -22,6 +22,7 @@ jobs:
         id: SSMClientToolsSetup
         run: |
           npm ci
+          npm run build
           npm start
       - name: Verify installation
         run: |
