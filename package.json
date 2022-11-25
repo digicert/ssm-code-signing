@@ -2,11 +2,11 @@
   "name": "ssm-github-actions",
   "version": "1.0.0",
   "description": "SSM Github actions marketplace app",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "start": "node ./build/index",
+    "start": "node ./build/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc "
+    "build": "ncc build index.ts -o build --license licenses.txt "
   },
   "repository": {
     "type": "git",
@@ -24,6 +24,11 @@
     "@digicert/ssm-client-tools-installer": "^1.1.4"
   },
   "devDependencies": {
-    "typescript": "^4.9.3"
+    "@vercel/ncc": "^0.34.0",
+    "babel-loader": "^9.1.0",
+    "ts-loader": "^9.4.1",
+    "typescript": "^4.9.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.0"
   }
 }
