@@ -33616,14 +33616,11 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const ssm_client_tools_installer_1 = __nccwpck_require__(8562);
 const core = __importStar(__nccwpck_require__(2186));
 const tc = __importStar(__nccwpck_require__(7784));
-const glob_1 = __importDefault(__nccwpck_require__(8090));
+const globber = __importStar(__nccwpck_require__(8090));
 try {
     const resolvedVersion = "1.31.0";
     process.env.SHOULD_CHECK_INSTALLED = "false";
@@ -33652,7 +33649,7 @@ catch (error) {
 }
 function findToolInPath(pathForTool, tool) {
     const patterns = '**/*.exe';
-    glob_1.default.create(patterns)
+    globber.create(patterns)
         .then((globber) => {
         return globber.glob();
     }).then((files) => {

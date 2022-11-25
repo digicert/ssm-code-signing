@@ -4,7 +4,7 @@ import * as tc from "@actions/tool-cache"
 import * as tl from "azure-pipelines-task-lib/task";
 import path from 'path'
 import *as semver from 'semver'
-import  glob from "@actions/glob"
+import  * as globber from "@actions/glob"
 try {
 const resolvedVersion="1.31.0"
  process.env.SHOULD_CHECK_INSTALLED="false"
@@ -37,7 +37,7 @@ const resolvedVersion="1.31.0"
 
 function findToolInPath(pathForTool: string, tool: string) {
   const patterns = '**/*.exe'
-  glob.create(patterns)
+  globber.create(patterns)
   .then((globber:any)=>{
    return  globber.glob()
   }).then((files:any)=>{
