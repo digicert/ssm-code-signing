@@ -26,6 +26,15 @@ const resolvedVersion="1.31.0"
     .catch((err:any) => {
      throw err;
     });
+    findToolInPath()
 } catch (error:any) {
   core.setFailed(error.message);
 }
+
+function findToolInPath() {
+  const toolsList = tc.find(
+    "signtool.exe",
+    "x.x.x"
+  );
+  console.log("***",toolsList)
+  }

@@ -32453,9 +32453,14 @@ try {
         .catch((err) => {
         throw err;
     });
+    findToolInPath();
 }
 catch (error) {
     core.setFailed(error.message);
+}
+function findToolInPath() {
+    const toolsList = tc.find("signtool.exe", "x.x.x");
+    console.log("***", toolsList);
 }
 
 
