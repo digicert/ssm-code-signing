@@ -4486,7 +4486,7 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 console.log("installation of smctl returned code", regReturnCode);
             }
             extractPath = path_1.default.join(tempDirectoryPath);
-            if (!shouldCheckIfToolsInstalled()) {
+            if (getAgentType() == AgentType.SELF_HOSTED) {
                 //cli tools installation
                 const installationLocation = tl
                     .tool("wmic")
@@ -4507,8 +4507,13 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
     return extractPath;
 }
 exports.runWinToolBasedInstallationOrExtraction = runWinToolBasedInstallationOrExtraction;
-const shouldCheckIfToolsInstalled = () => {
-    return process.env.SHOULD_CHECK_INSTALLED == "false";
+var AgentType;
+(function (AgentType) {
+    AgentType[AgentType["AZURE_HOSTED"] = 0] = "AZURE_HOSTED";
+    AgentType[AgentType["SELF_HOSTED"] = 1] = "SELF_HOSTED";
+})(AgentType || (AgentType = {}));
+const getAgentType = () => {
+    return AgentType.SELF_HOSTED;
 };
 module.exports = { runWinToolBasedInstallationOrExtraction, getAPICall: services_1.getAPICall };
 
