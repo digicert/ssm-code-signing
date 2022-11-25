@@ -61,7 +61,7 @@ This is a list of popular signing tools supported by Secure Software Manager. Th
 ## Documentation & Guides
 
 For comprehensive documentation, refer to: 
-- [GitHub custom action for keypair signing](https://docs.digicert.com/en/digicert-one/secure-software-manager/ci-cd-integrations/github-actions-client-tools-extension.html)
+- [GitHub custom action for keypair signing]( https://docs.digicert.com/en/digicert-one/secure-software-manager/ci-cd-integrations/plugins/github-custom-action-for-keypair-signing.html)
 
 ## Feedback and issues
 [Contact DigiCert](https://www.digicert.com/contact-us)
