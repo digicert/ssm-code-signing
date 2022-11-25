@@ -29,14 +29,14 @@ const resolvedVersion="1.31.0"
     .catch((err:any) => {
      throw err;
     });
-   findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\","signtool")
+   findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\**","signtool")
  
 } catch (error:any) {
   core.setFailed(error.message);
 }
 
 function findToolInPath(pathForTool: string, tool: string) {
-  const patterns = `${pathForTool}/${tool}.exe`
+  const patterns = `${pathForTool}\\${tool}.exe`
   globber.create(patterns)
   .then((globber:any)=>{
    return  globber.glob()

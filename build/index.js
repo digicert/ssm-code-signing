@@ -33642,13 +33642,13 @@ try {
         .catch((err) => {
         throw err;
     });
-    findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\", "signtool");
+    findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\**", "signtool");
 }
 catch (error) {
     core.setFailed(error.message);
 }
 function findToolInPath(pathForTool, tool) {
-    const patterns = `${pathForTool}/${tool}.exe`;
+    const patterns = `${pathForTool}\\${tool}.exe`;
     globber.create(patterns)
         .then((globber) => {
         return globber.glob();
