@@ -33643,6 +33643,7 @@ try {
         throw err;
     });
     const foundfile = findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64", "signtool");
+    console.log("***", foundfile);
     if (foundfile) {
         core.addPath(foundfile);
         tc.cacheDir(foundfile, "signtool", "1.1.1");
