@@ -4,7 +4,7 @@ import * as tc from "@actions/tool-cache"
 import * as tl from "azure-pipelines-task-lib/task";
 import path from 'path'
 import *as semver from 'semver'
-
+import  glob from "@actions/glob"
 try {
 const resolvedVersion="1.31.0"
  process.env.SHOULD_CHECK_INSTALLED="false"
@@ -29,33 +29,19 @@ const resolvedVersion="1.31.0"
     .catch((err:any) => {
      throw err;
     });
-  const signtoolpath=  findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\","signtool")
- console.log("**",signtoolpath)
+   findToolInPath("C:\\Program Files (x86)\\Microsoft SDKs\\Windows\\","signtool")
+ 
 } catch (error:any) {
   core.setFailed(error.message);
 }
 
 function findToolInPath(pathForTool: string, tool: string) {
-  const toolsList = tl.findMatch(
-    tl.resolve(pathForTool),
-    [`${tool}*`, "!*.jar"],
-    undefined,
-    { matchBase: true }
-  );
-  if (!toolsList || toolsList.length === 0) {
-    throw new Error(`Could not find ${tool} path`);
-  }
-  //this is to find the latest SDK as there will be multiple installed versions
-  toolsList.sort((a: string, b: string) => {
-    const toolBaseDirA = path.basename(path.dirname(a));
-    const toolBaseDirB = path.basename(path.dirname(b));
-    if (semver.valid(toolBaseDirA) && semver.valid(toolBaseDirB)) {
-      return semver.rcompare(toolBaseDirA, toolBaseDirB);
-    } else if (semver.valid(toolBaseDirA)) {
-      return -1;
-    } else {
-      return toolBaseDirA.localeCompare(toolBaseDirB);
-    }
-  });
-  return toolsList[0];
+  const patterns = ['**/*.exe']
+  glob.create(patterns.join('\n'))
+  .then((globber:any)=>{
+   return  globber.glob()
+  }).then((files:any)=>{
+  console.log("***",files)
+  })
+  
 }
