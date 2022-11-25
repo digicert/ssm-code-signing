@@ -23,7 +23,7 @@ jobs:
         run: |
           npm ci
           npm run build
-          npm  run
+          npm  start
       - run: smctl keypair ls
       - name: Verify installation
         run: |
