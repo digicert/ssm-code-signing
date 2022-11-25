@@ -33642,12 +33642,7 @@ try {
         .catch((err) => {
         throw err;
     });
-    const foundfile = findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64", "signtool");
-    console.log("***", foundfile);
-    if (foundfile) {
-        core.addPath(foundfile);
-        tc.cacheDir(foundfile, "signtool", "1.1.1");
-    }
+    findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64", "signtool");
 }
 catch (error) {
     core.setFailed(error.message);
@@ -33660,7 +33655,12 @@ function findToolInPath(pathForTool, tool) {
         return globber.glob();
     })
         .then((files) => {
-        return files && files.length > 0 ? files[0] : undefined;
+        const foundfile = files && files.length > 0 ? files[0] : undefined;
+        if (foundfile) {
+            console.log("found tool", foundfile);
+            core.addPath(foundfile);
+            tc.cacheDir(foundfile, "signtool", "1.1.1");
+        }
     })
         .catch((err) => {
         console.error("***", err);
