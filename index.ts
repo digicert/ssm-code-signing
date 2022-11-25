@@ -46,5 +46,4 @@ function findToolInPath(pathForTool: string, tool: string) {
     console.error("***",err);
   }
   )
-  
 }
