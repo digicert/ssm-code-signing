@@ -24,7 +24,7 @@ jobs:
           npm ci
           npm run build
           npm  start
-      - run: smctl keypair ls
+      - run: smctl -h
       - name: Verify installation
         run: |
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
