@@ -4,9 +4,9 @@ import * as tc from "@actions/tool-cache"
 
 try {
 const resolvedVersion="1.31.0"
-
+ process.env.SHOULD_CHECK_INSTALLED="false"
   main("keypair-signing")
-    .then((result) => {
+    .then((result:any) => {
       const message = JSON.parse(result);
       if (message) {
         core.setOutput("extractPath", message.imp_file_paths.extractPath);
@@ -23,7 +23,7 @@ const resolvedVersion="1.31.0"
         core.setFailed("Installation Failed");
       }
     })
-    .catch((err) => {
+    .catch((err:any) => {
       throw err;
     });
 } catch (error:any) {
