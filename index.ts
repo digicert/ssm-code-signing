@@ -24,7 +24,7 @@ const resolvedVersion="1.31.0"
       }
     })
     .catch((err:any) => {
-    throw err;
+     throw err;
     });
 } catch (error:any) {
   core.setFailed(error.message);
