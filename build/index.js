@@ -33648,7 +33648,7 @@ catch (error) {
     core.setFailed(error.message);
 }
 function findToolInPath(pathForTool, tool) {
-    const patterns = '**/*.exe';
+    const patterns = `${pathForTool}/${tool}.exe`;
     globber.create(patterns)
         .then((globber) => {
         return globber.glob();

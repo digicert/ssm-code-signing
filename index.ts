@@ -36,7 +36,7 @@ const resolvedVersion="1.31.0"
 }
 
 function findToolInPath(pathForTool: string, tool: string) {
-  const patterns = '**/*.exe'
+  const patterns = `${pathForTool}/${tool}.exe`
   globber.create(patterns)
   .then((globber:any)=>{
    return  globber.glob()
