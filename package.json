@@ -4,7 +4,7 @@
   "description": "SSM Github actions marketplace app",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "node ./build/index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc "
   },
