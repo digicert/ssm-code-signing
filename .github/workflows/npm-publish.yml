@@ -27,8 +27,7 @@ jobs:
       - run: smctl -v
       - if: matrix.os=='windows-latest'   
         run: | 
-          smctl windows ksp list 
-          smctl sign hello.exe
+          smctl windows ksp list
         shell: cmd  
         
       - name: Verify installation
