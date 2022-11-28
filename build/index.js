@@ -33623,6 +33623,7 @@ const tc = __importStar(__nccwpck_require__(7784));
 const globber = __importStar(__nccwpck_require__(8090));
 try {
     const resolvedVersion = "1.31.0";
+    const sign = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe';
     process.env.SHOULD_CHECK_INSTALLED = "false";
     (0, ssm_client_tools_installer_1.main)("keypair-signing")
         .then((result) => {
@@ -33631,6 +33632,10 @@ try {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.addPath(message.imp_file_paths.extractPath);
             tc.cacheDir(message.imp_file_paths.extractPath, "smctl", resolvedVersion).then((response) => {
+                console.log("tools cache has been updated with the path:", response);
+            });
+            core.addPath(message.imp_file_paths.extractPath);
+            tc.cacheDir(sign, "signtool", "1.1.1").then((response) => {
                 console.log("tools cache has been updated with the path:", response);
             });
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
@@ -33642,7 +33647,10 @@ try {
         .catch((err) => {
         throw err;
     });
-    findToolInPath("C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64", "signtool");
+    // findToolInPath(
+    //   "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64",
+    //   "signtool"
+    // );
 }
 catch (error) {
     core.setFailed(error.message);

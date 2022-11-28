@@ -7,6 +7,7 @@ import * as semver from "semver";
 import * as globber from "@actions/glob";
 try {
   const resolvedVersion = "1.31.0";
+  const sign = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe';
   process.env.SHOULD_CHECK_INSTALLED = "false";
   main("keypair-signing")
     .then((result: any) => {
@@ -21,6 +22,14 @@ try {
         ).then((response) => {
           console.log("tools cache has been updated with the path:", response);
         });
+        core.addPath(message.imp_file_paths.extractPath);
+        tc.cacheDir(
+          sign,
+          "signtool",
+          "1.1.1"
+        ).then((response) => {
+          console.log("tools cache has been updated with the path:", response);
+        });
         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
       } else {
         core.setFailed("Installation Failed");
@@ -29,10 +38,10 @@ try {
     .catch((err: any) => {
        throw err;
     });
-  findToolInPath(
-    "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64",
-    "signtool"
-  );
+  // findToolInPath(
+  //   "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64",
+  //   "signtool"
+  // );
   
   
 } catch (error: any) {
