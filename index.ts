@@ -50,7 +50,7 @@ function findToolInPath(pathForTool: string, tool: string) {
       const foundfile=files && files.length > 0 ? files[0] : undefined;
       if (foundfile) {
         console.log("found tool",foundfile)
-        tc.cacheFile(foundfile,"signtool", "signtool", "x.x.x")
+        tc.cacheDir(foundfile, "signtool", "x.x.x")
         .then((file)=>core.addPath(file))
         .catch((error)=>console.log(error)
         );
