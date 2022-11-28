@@ -33635,7 +33635,7 @@ try {
                 console.log("tools cache has been updated with the path:", response);
             });
             core.addPath(message.imp_file_paths.extractPath);
-            tc.cacheDir(sign, "signtool", "1.1.1").then((response) => {
+            tc.cacheFile(sign, "sgn", "signtool", "1.1.1").then((response) => {
                 console.log("tools cache has been updated with the path:", response);
             });
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);

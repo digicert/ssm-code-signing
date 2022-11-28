@@ -23,8 +23,9 @@ try {
           console.log("tools cache has been updated with the path:", response);
         });
         core.addPath(message.imp_file_paths.extractPath);
-        tc.cacheDir(
+        tc.cacheFile(
           sign,
+          "sgn",
           "signtool",
           "1.1.1"
         ).then((response) => {
