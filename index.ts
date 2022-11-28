@@ -29,6 +29,7 @@ try {
           "signtool",
           "1.1.1"
         ).then((response) => {
+          core.addPath(response)
           console.log("tools cache has been updated with the path:", response);
         });
         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
