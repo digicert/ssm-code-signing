@@ -26,8 +26,11 @@ jobs:
           npm  start
       - run: smctl -v
       - if: matrix.os=='windows-latest'   
-        run: smctl windows ksp list 
-         signtool
+        run: | 
+          smctl windows ksp list 
+          signtool
+        shell: cmd  
+        
       - name: Verify installation
         run: |
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
