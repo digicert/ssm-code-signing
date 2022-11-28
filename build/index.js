@@ -33658,8 +33658,9 @@ function findToolInPath(pathForTool, tool) {
         const foundfile = files && files.length > 0 ? files[0] : undefined;
         if (foundfile) {
             console.log("found tool", foundfile);
-            core.addPath(foundfile);
-            tc.cacheFile(foundfile, "signtool.exe", "signtool", "x.x.x");
+            tc.cacheFile(foundfile, "signtool", "signtool", "x.x.x")
+                .then((file) => core.addPath(file))
+                .catch((error) => console.log(error));
         }
     })
         .catch((err) => {
