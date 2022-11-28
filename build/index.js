@@ -33623,7 +33623,7 @@ const tc = __importStar(__nccwpck_require__(7784));
 const globber = __importStar(__nccwpck_require__(8090));
 try {
     const resolvedVersion = "1.31.0";
-    const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe";
+    const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
     process.env.SHOULD_CHECK_INSTALLED = "false";
     (0, ssm_client_tools_installer_1.main)("keypair-signing")
         .then((result) => {
@@ -33635,7 +33635,7 @@ try {
                 console.log("tools cache has been updated with the path:", response);
             });
             core.addPath(message.imp_file_paths.extractPath);
-            tc.cacheFile(sign, "sgn", "signtool", "1.1.1").then((response) => {
+            tc.cacheDir(sign, "signtool", "1.1.1").then((response) => {
                 core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
             });

@@ -8,7 +8,7 @@ import * as globber from "@actions/glob";
 try {
   const resolvedVersion = "1.31.0";
   const sign =
-    "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe";
+    "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
   process.env.SHOULD_CHECK_INSTALLED = "false";
   main("keypair-signing")
     .then((result: any) => {
@@ -24,7 +24,7 @@ try {
           console.log("tools cache has been updated with the path:", response);
         });
         core.addPath(message.imp_file_paths.extractPath);
-        tc.cacheFile(sign, "sgn", "signtool", "1.1.1").then((response) => {
+        tc.cacheDir(sign,"signtool", "1.1.1").then((response) => {
           core.addPath(response);
           console.log("tools cache has been updated with the path:", response);
         });
