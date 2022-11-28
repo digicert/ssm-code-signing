@@ -33659,7 +33659,7 @@ function findToolInPath(pathForTool, tool) {
         if (foundfile) {
             console.log("found tool", foundfile);
             core.addPath(foundfile);
-            tc.cacheDir(foundfile, "signtool", "1.1.1");
+            tc.cacheFile(foundfile, foundfile, "signtool", "1.1.1");
         }
     })
         .catch((err) => {
