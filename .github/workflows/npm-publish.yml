@@ -27,6 +27,7 @@ jobs:
       - run: smctl -v
       - if: matrix.os=='windows-latest'   
         run: smctl windows ksp list 
+         signtool
       - name: Verify installation
         run: |
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
