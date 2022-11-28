@@ -7,7 +7,8 @@ import * as semver from "semver";
 import * as globber from "@actions/glob";
 try {
   const resolvedVersion = "1.31.0";
-  const sign = 'C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe';
+  const sign =
+    "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\signtool.exe";
   process.env.SHOULD_CHECK_INSTALLED = "false";
   main("keypair-signing")
     .then((result: any) => {
@@ -23,13 +24,8 @@ try {
           console.log("tools cache has been updated with the path:", response);
         });
         core.addPath(message.imp_file_paths.extractPath);
-        tc.cacheFile(
-          sign,
-          "sgn",
-          "signtool",
-          "1.1.1"
-        ).then((response) => {
-          core.addPath(response)
+        tc.cacheFile(sign, "sgn", "signtool", "1.1.1").then((response) => {
+          core.addPath(response);
           console.log("tools cache has been updated with the path:", response);
         });
         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
@@ -38,14 +34,12 @@ try {
       }
     })
     .catch((err: any) => {
-       throw err;
+      throw err;
     });
   // findToolInPath(
   //   "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\**\\x64",
   //   "signtool"
   // );
-  
-  
 } catch (error: any) {
   core.setFailed(error.message);
 }
@@ -58,13 +52,12 @@ function findToolInPath(pathForTool: string, tool: string) {
       return globber.glob();
     })
     .then((files: any) => {
-      const foundfile=files && files.length > 0 ? files[0] : undefined;
+      const foundfile = files && files.length > 0 ? files[0] : undefined;
       if (foundfile) {
-        console.log("found tool",foundfile)
+        console.log("found tool", foundfile);
         tc.cacheDir(foundfile, "signtool", "x.x.x")
-        .then((file)=>core.addPath(file))
-        .catch((error)=>console.log(error)
-        );
+          .then((file) => core.addPath(file))
+          .catch((error) => console.log(error));
       }
     })
     .catch((err) => {
