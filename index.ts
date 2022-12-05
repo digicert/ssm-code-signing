@@ -6,6 +6,7 @@ import path from "path";
 import * as semver from "semver";
 import * as globber from "@actions/glob";
 import fs from 'fs'
+import * as exec from "@actions/exec"
 
 const toolInstaller=async (toolPath:string,toolName:any)=>{
   if(toolName!="smctl" || toolName!="signtool"){
@@ -28,7 +29,7 @@ try {
   const resolvedVersion = "1.31.0";
   const sign =
     "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\30.0.0\\";  
+  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\30.0.0\\apksigner.bat";  
   process.env.SHOULD_CHECK_INSTALLED = "false";
   const result=await main("keypair-signing")
   const message = JSON.parse(result);
@@ -47,8 +48,8 @@ try {
           core.addPath(response);
           console.log("tools cache has been updated with the path:", response);
         });
-        tc.cacheDir(apk,"apksigner", "latest").then((response) => {
-          core.addPath(response);
+        exec.exec(apk).then((response) => {
+          
           console.log("tools cache has been updated with the path:", response);
         });
         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
