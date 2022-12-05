@@ -6,6 +6,7 @@ import path from "path";
 import * as semver from "semver";
 import * as globber from "@actions/glob";
 import fs from 'fs'
+import * as child_process from 'child_process'
 import * as exec from "@actions/exec"
 
 const toolInstaller=async (toolPath:string,toolName:any)=>{
@@ -52,7 +53,12 @@ try {
           core.addPath(response);
           console.log("tools cache has been updated with the path:", response);
         });
-        tc.cacheDir(apk,"apksigner.bat", "latest").then((response) => {
+        
+
+child_process.exec(`${apk}\\apksigner.bat`, function(error, stdout, stderr) {
+    console.log(stdout);
+});
+        tc.cacheDir(apk,"apksigner", "latest").then((response) => {
           core.addPath(response);
           console.log("tools cache has been updated with the path:", response);
         });

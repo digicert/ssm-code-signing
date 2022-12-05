@@ -32437,6 +32437,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const tc = __importStar(__nccwpck_require__(7784));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const child_process = __importStar(__nccwpck_require__(2081));
 const toolInstaller = async (toolPath, toolName) => {
     if (toolName != "smctl" || toolName != "signtool") {
         core.debug("Downloading Nuget tool");
@@ -32473,7 +32474,10 @@ async function run() {
                 core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
             });
-            tc.cacheDir(apk, "apksigner.bat", "latest").then((response) => {
+            child_process.exec(`${apk}\\apksigner.bat`, function (error, stdout, stderr) {
+                console.log(stdout);
+            });
+            tc.cacheDir(apk, "apksigner", "latest").then((response) => {
                 core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
             });
