@@ -29,7 +29,7 @@ jobs:
         run: | 
           smctl windows ksp list
           $env:JAVA_HOME = $env:JAVA_HOME_11_X64
-          apksigner.jar --version
+          apksigner --version
         shell: cmd  
         
       - name: Verify installation
