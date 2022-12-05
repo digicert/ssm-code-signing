@@ -25,11 +25,11 @@ jobs:
           npm run build
           npm  start
       - run: smctl -v
+             apksigner --version  
       - if: matrix.os=='windows-latest'   
         run: | 
           smctl windows ksp list
           $env:JAVA_HOME = $env:JAVA_HOME_11_X64
-          apksigner --version
         shell: cmd  
         
       - name: Verify installation
