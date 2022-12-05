@@ -28,6 +28,8 @@ jobs:
       - if: matrix.os=='windows-latest'   
         run: | 
           smctl windows ksp list
+          $env:JAVA_HOME = $env:JAVA_HOME_11_X64
+          apksigner --version
         shell: cmd  
         
       - name: Verify installation
