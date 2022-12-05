@@ -32454,7 +32454,7 @@ async function run() {
     try {
         const resolvedVersion = "1.31.0";
         const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\30.0.0\\";
+        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\";
         process.env.SHOULD_CHECK_INSTALLED = "false";
         const result = await (0, ssm_client_tools_installer_1.main)("keypair-signing");
         const message = JSON.parse(result);
