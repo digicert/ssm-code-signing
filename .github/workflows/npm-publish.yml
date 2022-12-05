@@ -24,7 +24,8 @@ jobs:
           npm ci
           npm run build
           npm  start
-      - run: smctl -v
+      - run: |
+             smctl -v
              apksigner --version  
       - if: matrix.os=='windows-latest'   
         run: | 
