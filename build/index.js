@@ -32437,7 +32437,6 @@ const core = __importStar(__nccwpck_require__(2186));
 const tc = __importStar(__nccwpck_require__(7784));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
-const exec = __importStar(__nccwpck_require__(1514));
 const toolInstaller = async (toolPath, toolName) => {
     if (toolName != "smctl" || toolName != "signtool") {
         core.debug("Downloading Nuget tool");
@@ -32455,7 +32454,7 @@ async function run() {
     try {
         const resolvedVersion = "1.31.0";
         const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\30.0.0\\apksigner.bat";
+        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\30.0.0\\lib";
         process.env.SHOULD_CHECK_INSTALLED = "false";
         const result = await (0, ssm_client_tools_installer_1.main)("keypair-signing");
         const message = JSON.parse(result);
@@ -32470,7 +32469,8 @@ async function run() {
                 core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
             });
-            exec.exec(apk).then((response) => {
+            tc.cacheDir(apk, "apksigner", "latest").then((response) => {
+                core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
             });
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
