@@ -29,6 +29,7 @@ jobs:
         run: | 
           # smctl windows ksp list
           apksigner version
+          jarsigner version
           
         shell: cmd  
         

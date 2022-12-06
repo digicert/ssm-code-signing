@@ -9152,6 +9152,8 @@ async function run() {
         core.addPath(toolcache);
         const jarSignerPath = await io.which('jarsigner', true);
         core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
+        const cache = await tc.cacheDir(jarSignerPath, 'jarsigner', 'latest');
+        core.addPath(cache);
         await exec.exec(`"${apkSigner}"`, [
             'version'
         ]);
