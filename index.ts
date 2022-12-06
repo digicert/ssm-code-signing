@@ -78,38 +78,27 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
   
 }
 
-
 function findToolInPath(pathForTool: string, tool: string) {
-  const toolsList = tc.find(
-    tool,
-    'latest'
-  );
-
-  if (!toolsList || toolsList.length === 0) {
-    throw new Error(`Could not find ${tool} path`);
-  }
-
-  //this is to find the latest SDK as there will be multiple installed versions
-  // toolsList.sort((a: string, b: string) => {
-  //   const toolBaseDirA = path.basename(path.dirname(a));
-  //   const toolBaseDirB = path.basename(path.dirname(b));
-  //   if (semver.valid(toolBaseDirA) && semver.valid(toolBaseDirB)) {
-  //     return semver.rcompare(toolBaseDirA, toolBaseDirB);
-  //   } else if (semver.valid(toolBaseDirA)) {
-  //     return -1;
-  //   } else {
-  //     return toolBaseDirA.localeCompare(toolBaseDirB);
-  //   }
-  // });
-  console.log('***',toolsList[0])
-  return toolsList[0];
+  const patterns = `${pathForTool}\\${tool}.jar`;
+  globber
+    .create(patterns)
+    .then((globber: any) => {
+      return globber.glob();
+    })
+    .then((files: any) => {
+      return files && files.length > 0 ? files[0] : undefined;
+    })
+    .catch((err) => {
+      console.error("***", err);
+    });
+  return undefined;
 }
 
 async function run(){
 try {
 //   const resolvedVersion = "1.31.0";
-  const android=process.env.ANDROID_HOME
-  const apk=`${android}\\build-tools\\29.0.3\\lib`;  
+  
+  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\lib";  
 //   process.env.SHOULD_CHECK_INSTALLED = "false";
 //   const result=await main("keypair-signing")
 //   const message = JSON.parse(result);
@@ -142,7 +131,7 @@ try {
 //       } else {
 //         core.setFailed("Installation Failed");
 //       }
-  const toolcache=await tc.cacheDir(apk,'apksigner','latest')
+  const toolcache:any=await findToolInPath(apk,'apksigner')
   core.debug(`....${toolcache}`)
   core.addPath(toolcache)      
   await exec.exec('apksigner',['--version']) 
