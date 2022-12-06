@@ -131,11 +131,27 @@ try {
 //       } else {
 //         core.setFailed("Installation Failed");
 //       }
-  const toolcache:any=await findToolInPath(apk,'apksigner')
-  core.debug(`....${toolcache}`)
-  console.log(`....${toolcache}`)
-  console.log("*****")
-  core.addPath(toolcache)      
+core.debug("Zipaligning APK file");
+
+// Find zipalign executable
+const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || '30.0.2';
+const androidHome = process.env.ANDROID_HOME;
+if (!androidHome) {
+    core.error("require ANDROID_HOME to be execute");
+    throw new Error("ANDROID_HOME is null");
+}
+const buildTools = path.join(androidHome, `build-tools/${buildToolsVersion}`);
+if (!fs.existsSync(buildTools)) {
+    core.error(`Couldnt find the Android build tools @ ${buildTools}`)
+}
+
+const zipAlign = path.join(buildTools, 'zipalign');
+core.debug(`Found 'zipalign' @ ${zipAlign}`);
+core.debug("Signing APK file");
+
+// find apksigner path
+const apkSigner = path.join(buildTools, 'apksigner');
+core.debug(`Found 'apksigner' @ ${apkSigner}`); 
   
 } catch (error: any) {
   core.setFailed(error.message);
