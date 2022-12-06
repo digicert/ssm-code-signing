@@ -9131,7 +9131,6 @@ async function run() {
         const toolcache = await findToolInPath(apk, 'apksigner');
         core.debug(`....${toolcache}`);
         core.addPath(toolcache);
-        await exec.exec('apksigner', ['--version']);
     }
     catch (error) {
         core.setFailed(error.message);

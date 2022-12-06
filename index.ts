@@ -134,7 +134,7 @@ try {
   const toolcache:any=await findToolInPath(apk,'apksigner')
   core.debug(`....${toolcache}`)
   core.addPath(toolcache)      
-  await exec.exec('apksigner',['--version']) 
+  
 } catch (error: any) {
   core.setFailed(error.message);
 }
