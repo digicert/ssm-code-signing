@@ -9097,7 +9097,7 @@ function findToolInPath(pathForTool, tool) {
 async function run() {
     try {
         //   const resolvedVersion = "1.31.0";
-        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\lib\\";
+        const apk = "C://Program Files (x86)//Android//android-sdk//build-tools//29.0.3//lib//";
         //   process.env.SHOULD_CHECK_INSTALLED = "false";
         //   const result=await main("keypair-signing")
         //   const message = JSON.parse(result);
@@ -9130,6 +9130,7 @@ async function run() {
         //       }
         const toolcache = await findToolInPath(apk, 'apksigner');
         core.debug(`....${toolcache}`);
+        console.log(`....${toolcache}`);
         console.log("*****");
         core.addPath(toolcache);
     }
