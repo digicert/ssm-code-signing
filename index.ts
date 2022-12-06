@@ -108,8 +108,8 @@ function findToolInPath(pathForTool: string, tool: string) {
 async function run(){
 try {
 //   const resolvedVersion = "1.31.0";
-  
-  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\lib";  
+  const android=process.env.ANDROID_HOME
+  const apk=`${android}\\build-tools\\29.0.3\\lib`;  
 //   process.env.SHOULD_CHECK_INSTALLED = "false";
 //   const result=await main("keypair-signing")
 //   const message = JSON.parse(result);
