@@ -78,46 +78,79 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
   
 }
 
+
+function findToolInPath(pathForTool: string, tool: string) {
+  const toolsList = tl.findMatch(
+    tl.resolve(pathForTool),
+    [`${tool}*`, "!*.jar"],
+    undefined,
+    { matchBase: true }
+  );
+
+  if (!toolsList || toolsList.length === 0) {
+    throw new Error(`Could not find ${tool} path`);
+  }
+
+  //this is to find the latest SDK as there will be multiple installed versions
+  toolsList.sort((a: string, b: string) => {
+    const toolBaseDirA = path.basename(path.dirname(a));
+    const toolBaseDirB = path.basename(path.dirname(b));
+    if (semver.valid(toolBaseDirA) && semver.valid(toolBaseDirB)) {
+      return semver.rcompare(toolBaseDirA, toolBaseDirB);
+    } else if (semver.valid(toolBaseDirA)) {
+      return -1;
+    } else {
+      return toolBaseDirA.localeCompare(toolBaseDirB);
+    }
+  });
+  console.log('***',toolsList[0])
+  return toolsList[0];
+}
+
 async function run(){
 try {
-  const resolvedVersion = "1.31.0";
+//   const resolvedVersion = "1.31.0";
   
   const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3";  
-  process.env.SHOULD_CHECK_INSTALLED = "false";
-  const result=await main("keypair-signing")
-  const message = JSON.parse(result);
-      if (message) {
-        core.setOutput("extractPath", message.imp_file_paths.extractPath);
-        core.addPath(message.imp_file_paths.extractPath);
-        tc.cacheDir(
-          message.imp_file_paths.extractPath,
-          "smctl",
-          resolvedVersion
-        ).then((response) => {
-          console.log("tools cache has been updated with the path:", response);
-        });
-        exec.exec(`${apk}\\apksigner.bat`)
-        exec.exec(`apksigner`)
-        tc.cacheDir(apk,"zipalign", "latest").then((response) => {
-          core.addPath(response);
-          console.log("tools cache has been updated with the path:", response);
-        });
+//   process.env.SHOULD_CHECK_INSTALLED = "false";
+//   const result=await main("keypair-signing")
+//   const message = JSON.parse(result);
+//       if (message) {
+//         core.setOutput("extractPath", message.imp_file_paths.extractPath);
+//         core.addPath(message.imp_file_paths.extractPath);
+//         tc.cacheDir(
+//           message.imp_file_paths.extractPath,
+//           "smctl",
+//           resolvedVersion
+//         ).then((response) => {
+//           console.log("tools cache has been updated with the path:", response);
+//         });
+//         exec.exec(`${apk}\\apksigner.bat`)
+//         exec.exec(`apksigner`)
+//         tc.cacheDir(apk,"zipalign", "latest").then((response) => {
+//           core.addPath(response);
+//           console.log("tools cache has been updated with the path:", response);
+//         });
         
 
-child_process.exec(`${apk}\\apksigner.bat`, function(error, stdout, stderr) {
-    console.log(stdout);
-});
-        tc.cacheDir(apk,"apksigner", "latest").then((response) => {
-          core.addPath(response);
-          console.log("tools cache has been updated with the path:", response);
-        });
-        core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-      } else {
-        core.setFailed("Installation Failed");
-      }       
+// child_process.exec(`${apk}\\apksigner.bat`, function(error, stdout, stderr) {
+//     console.log(stdout);
+// });
+//         tc.cacheDir(apk,"apksigner", "latest").then((response) => {
+//           core.addPath(response);
+//           console.log("tools cache has been updated with the path:", response);
+//         });
+//         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
+//       } else {
+//         core.setFailed("Installation Failed");
+//       }
+findToolInPath(apk,"apksigner")       
 } catch (error: any) {
   core.setFailed(error.message);
 }
 }
+
+
+
 
 run();
