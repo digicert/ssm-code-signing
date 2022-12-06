@@ -32438,24 +32438,68 @@ const tc = __importStar(__nccwpck_require__(7784));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const child_process = __importStar(__nccwpck_require__(2081));
+const exec = __importStar(__nccwpck_require__(1514));
+const signtools = (/* unused pure expression or super */ null && (["smctl", 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner']));
 const toolInstaller = async (toolPath, toolName) => {
-    if (toolName != "smctl" || toolName != "signtool") {
-        core.debug("Downloading Nuget tool");
-        const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
-        // Rename the file which is a GUID without extension
-        var folder = path_1.default.dirname(nugetPath);
-        var fullPath = path_1.default.join(folder, "nuget.exe");
-        fs_1.default.renameSync(nugetPath, fullPath);
+    let cacheDir;
+    switch (toolName) {
+        case 'smctl':
+            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+            core.addPath(cacheDir);
+            console.log("tools cache has been updated with the path:", cacheDir);
+            break;
+        case 'signtool':
+            const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
+            cacheDir = await tc.cacheDir(sign, toolName, "latest");
+            core.addPath(cacheDir);
+            console.log("tools cache has been updated with the path:", cacheDir);
+            break;
+        case 'nuget':
+            core.debug("Downloading Nuget tool");
+            const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
+            // Rename the file which is a GUID without extension
+            var folder = path_1.default.dirname(nugetPath);
+            var fullPath = path_1.default.join(folder, "nuget.exe");
+            fs_1.default.renameSync(nugetPath, fullPath);
+            cacheDir = await tc.cacheDir(folder, toolName, "latest");
+            core.addPath(cacheDir);
+            core.debug(`Cached Tool Dir ${cacheDir}`);
+            break;
+        case 'mage':
+            const downloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+            let downloadPath = '';
+            try {
+                downloadPath = await tc.downloadTool(downloadUrl);
+            }
+            catch (err) {
+                core.debug(err);
+                throw new Error(`failed to download Mage v: ${err.message}`);
+            }
+            // Extract tar
+            const extractPath = await tc.extractTar(downloadPath);
+            cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
+            core.addPath(cacheDir);
+            console.log("tools cache has been updated with the path:", cacheDir);
+            break;
+        case 'apksigner':
+            exec.exec;
+            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+            core.addPath(cacheDir);
+            console.log("tools cache has been updated with the path:", cacheDir);
+            break;
+        case 'jarsigner':
+            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+            core.addPath(cacheDir);
+            console.log("tools cache has been updated with the path:", cacheDir);
+            break;
     }
-    const cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-    core.addPath(cacheDir);
-    console.log("tools cache has been updated with the path:", cacheDir);
+    if (toolName != "smctl" || toolName != "signtool") {
+    }
 };
 async function run() {
     try {
         const resolvedVersion = "1.31.0";
-        const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\";
+        const apk = "C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3";
         process.env.SHOULD_CHECK_INSTALLED = "false";
         const result = await (0, ssm_client_tools_installer_1.main)("keypair-signing");
         const message = JSON.parse(result);
@@ -32465,11 +32509,8 @@ async function run() {
             tc.cacheDir(message.imp_file_paths.extractPath, "smctl", resolvedVersion).then((response) => {
                 console.log("tools cache has been updated with the path:", response);
             });
-            core.addPath(message.imp_file_paths.extractPath);
-            tc.cacheDir(sign, "signtool", "1.1.1").then((response) => {
-                core.addPath(response);
-                console.log("tools cache has been updated with the path:", response);
-            });
+            exec.exec(`${apk}\\apksigner.bat`);
+            exec.exec(`apksigner`);
             tc.cacheDir(apk, "zipalign", "latest").then((response) => {
                 core.addPath(response);
                 console.log("tools cache has been updated with the path:", response);
