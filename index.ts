@@ -80,11 +80,9 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
 
 
 function findToolInPath(pathForTool: string, tool: string) {
-  const toolsList = tl.findMatch(
-    tl.resolve(pathForTool),
-    [`${tool}*`, "!*.jar"],
-    undefined,
-    { matchBase: true }
+  const toolsList = tc.find(
+    tool,
+    'latest'
   );
 
   if (!toolsList || toolsList.length === 0) {
@@ -92,17 +90,17 @@ function findToolInPath(pathForTool: string, tool: string) {
   }
 
   //this is to find the latest SDK as there will be multiple installed versions
-  toolsList.sort((a: string, b: string) => {
-    const toolBaseDirA = path.basename(path.dirname(a));
-    const toolBaseDirB = path.basename(path.dirname(b));
-    if (semver.valid(toolBaseDirA) && semver.valid(toolBaseDirB)) {
-      return semver.rcompare(toolBaseDirA, toolBaseDirB);
-    } else if (semver.valid(toolBaseDirA)) {
-      return -1;
-    } else {
-      return toolBaseDirA.localeCompare(toolBaseDirB);
-    }
-  });
+  // toolsList.sort((a: string, b: string) => {
+  //   const toolBaseDirA = path.basename(path.dirname(a));
+  //   const toolBaseDirB = path.basename(path.dirname(b));
+  //   if (semver.valid(toolBaseDirA) && semver.valid(toolBaseDirB)) {
+  //     return semver.rcompare(toolBaseDirA, toolBaseDirB);
+  //   } else if (semver.valid(toolBaseDirA)) {
+  //     return -1;
+  //   } else {
+  //     return toolBaseDirA.localeCompare(toolBaseDirB);
+  //   }
+  // });
   console.log('***',toolsList[0])
   return toolsList[0];
 }
@@ -111,7 +109,7 @@ async function run(){
 try {
 //   const resolvedVersion = "1.31.0";
   
-  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3";  
+  const apk="C:\\Program Files (x86)\\Android\\android-sdk\\build-tools\\29.0.3\\lib";  
 //   process.env.SHOULD_CHECK_INSTALLED = "false";
 //   const result=await main("keypair-signing")
 //   const message = JSON.parse(result);
@@ -144,7 +142,10 @@ try {
 //       } else {
 //         core.setFailed("Installation Failed");
 //       }
-findToolInPath(apk,"apksigner")       
+  const toolcache=await tc.find('apksigner','latest')
+  core.debug(`....${toolcache}`)
+  core.addPath(toolcache)      
+  await exec.exec('apksigner',['--version']) 
 } catch (error: any) {
   core.setFailed(error.message);
 }
