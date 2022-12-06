@@ -9143,14 +9143,12 @@ async function run() {
         const zipAlign = path_1.default.join(buildTools, 'zipalign');
         core.debug(`Found 'zipalign' @ ${zipAlign}`);
         core.debug("Signing APK file");
-        const signedApkFile = "";
         // find apksigner path
         const apkSigner = path_1.default.join(buildTools, 'apksigner');
         core.debug(`Found 'apksigner' @ ${apkSigner}`);
         core.debug("Verifying Signed APK");
         await exec.exec(`"${apkSigner}"`, [
-            'verify',
-            signedApkFile
+            'version'
         ]);
     }
     catch (error) {
