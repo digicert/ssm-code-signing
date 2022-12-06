@@ -148,10 +148,15 @@ if (!fs.existsSync(buildTools)) {
 const zipAlign = path.join(buildTools, 'zipalign');
 core.debug(`Found 'zipalign' @ ${zipAlign}`);
 core.debug("Signing APK file");
-
+const signedApkFile=""
 // find apksigner path
 const apkSigner = path.join(buildTools, 'apksigner');
 core.debug(`Found 'apksigner' @ ${apkSigner}`); 
+core.debug("Verifying Signed APK");
+await exec.exec(`"${apkSigner}"`, [
+    'verify',
+    signedApkFile
+]);
   
 } catch (error: any) {
   core.setFailed(error.message);
