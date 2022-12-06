@@ -142,7 +142,7 @@ try {
 //       } else {
 //         core.setFailed("Installation Failed");
 //       }
-  const toolcache=await tc.find('apksigner','latest')
+  const toolcache=await tc.cacheDir(apk,'apksigner','latest')
   core.debug(`....${toolcache}`)
   core.addPath(toolcache)      
   await exec.exec('apksigner',['--version']) 
