@@ -24,11 +24,11 @@ jobs:
           npm ci
           npm run build
           npm  start
-      - run: smctl -v  
+      # - run: smctl -v  
       - if: matrix.os=='windows-latest'   
         run: | 
-          smctl windows ksp list
-          apksigner sign 
+          # smctl windows ksp list
+          apksigner version
           
         shell: cmd  
         

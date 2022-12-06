@@ -9147,6 +9147,7 @@ async function run() {
         const apkSigner = path_1.default.join(buildTools, 'apksigner');
         core.debug(`Found 'apksigner' @ ${apkSigner}`);
         core.debug("Verifying Signed APK");
+        core.addPath(apkSigner);
         await exec.exec(`"${apkSigner}"`, [
             'version'
         ]);
