@@ -9020,6 +9020,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const tc = __importStar(__nccwpck_require__(7784));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const globber = __importStar(__nccwpck_require__(8090));
+const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const exec = __importStar(__nccwpck_require__(1514));
 const signtools = (/* unused pure expression or super */ null && (["smctl", 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner']));
@@ -9149,6 +9150,8 @@ async function run() {
         core.debug("Verifying Signed APK");
         const toolcache = await tc.cacheDir(buildTools, 'apksigner', '0.9');
         core.addPath(toolcache);
+        const jarSignerPath = await io.which('jarsigner', true);
+        core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
         await exec.exec(`"${apkSigner}"`, [
             'version'
         ]);

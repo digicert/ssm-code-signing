@@ -5,6 +5,7 @@ import * as tl from "azure-pipelines-task-lib/task";
 import path from "path";
 import * as semver from "semver";
 import * as globber from "@actions/glob";
+import * as io from "@actions/io"
 import fs from 'fs'
 import * as child_process from 'child_process'
 import * as exec from "@actions/exec"
@@ -154,10 +155,13 @@ core.debug(`Found 'apksigner' @ ${apkSigner}`);
 core.debug("Verifying Signed APK");
 const toolcache=await tc.cacheDir(buildTools,'apksigner','0.9')
 core.addPath(toolcache)
+const jarSignerPath = await io.which('jarsigner', true);
+core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
 
 await exec.exec(`"${apkSigner}"`, [
     'version'
 ]);
+
   
 } catch (error: any) {
   core.setFailed(error.message);
