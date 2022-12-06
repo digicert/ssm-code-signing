@@ -152,7 +152,7 @@ core.debug("Signing APK file");
 const apkSigner = path.join(buildTools, 'apksigner');
 core.debug(`Found 'apksigner' @ ${apkSigner}`); 
 core.debug("Verifying Signed APK");
-const toolcache=await tc.cacheFile(apkSigner,apkSigner,'apksigner','0.9')
+const toolcache=await tc.cacheDir(buildTools,'apksigner','0.9')
 core.addPath(toolcache)
 
 await exec.exec(`"${apkSigner}"`, [
