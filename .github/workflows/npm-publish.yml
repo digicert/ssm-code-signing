@@ -37,15 +37,14 @@ jobs:
       - if: matrix.os=='windows-latest'   
         run: | 
           jarsigner --help
-          nuget --help
-          mage --help
+          mage -version
+          nuget sign
         shell: cmd     
       
       - if: matrix.os=='ubuntu-latest'   
         run: | 
           jarsigner --help
           mage -version
-          nuget sign 
         shell: bash     
       - name: Verify installation
         run: |
