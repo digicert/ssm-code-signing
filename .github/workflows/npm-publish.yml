@@ -36,7 +36,6 @@ jobs:
         shell: cmd  
       - if: matrix.os=='windows-latest'   
         run: | 
-          apksigner version
           jarsigner --help
           nuget --help
           mage --help
