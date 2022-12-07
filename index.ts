@@ -7,8 +7,9 @@ import * as semver from "semver";
 import * as globber from "@actions/glob";
 import * as io from "@actions/io"
 import fs from 'fs'
-import * as child_process from 'child_process'
-import * as exec from "@actions/exec"
+import os from 'os'
+
+const osPlat: string = os.platform();
 const signtools=["smctl",'signtool','nuget','mage','apksigner','jarsigner']
 const toolInstaller=async (toolName:string,toolPath:string="")=>{
    let cacheDir;
@@ -38,7 +39,8 @@ const toolInstaller=async (toolName:string,toolPath:string="")=>{
      core.debug(`Cached Tool Dir ${cacheDir}`);
      break;                
      case "mage":
-      const magedownloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+      const magedownloadUrl =(osPlat=="win32")? `https://github.com/magefile/mage/releases/download/v1.14.0/
+      mage_1.14.0_Windows-64bit.zip `:`https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
       let downloadPath = '';
 
   try {
@@ -50,11 +52,8 @@ const toolInstaller=async (toolName:string,toolPath:string="")=>{
   }
 
   // Extract tar
-  const extractPath = await tc.extractTar(downloadPath);
-  var folder = path.dirname(extractPath);
-    var fullPath = path.join(folder, "mage.exe");
-    fs.renameSync(extractPath, fullPath);
-      cacheDir=await tc.cacheDir(folder,toolName,"latest")
+  const extractPath = osPlat=="win32"?await tc.extractZip(downloadPath) :await tc.extractTar(downloadPath);
+      cacheDir=await tc.cacheDir(extractPath,toolName,"latest")
      core.addPath(cacheDir);
      console.log("tools cache has been updated with the path:", cacheDir);
      break;                

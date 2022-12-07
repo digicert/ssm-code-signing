@@ -32438,6 +32438,8 @@ const tc = __importStar(__nccwpck_require__(7784));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const os_1 = __importDefault(__nccwpck_require__(2037));
+const osPlat = os_1.default.platform();
 const signtools = ["smctl", 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner'];
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
@@ -32465,7 +32467,8 @@ const toolInstaller = async (toolName, toolPath = "") => {
             core.debug(`Cached Tool Dir ${cacheDir}`);
             break;
         case "mage":
-            const magedownloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+            const magedownloadUrl = (osPlat == "win32") ? `https://github.com/magefile/mage/releases/download/v1.14.0/
+      mage_1.14.0_Windows-64bit.zip ` : `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
             let downloadPath = '';
             try {
                 downloadPath = await tc.downloadTool(magedownloadUrl);
@@ -32475,11 +32478,8 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 throw new Error(`failed to download Mage v: ${err.message}`);
             }
             // Extract tar
-            const extractPath = await tc.extractTar(downloadPath);
-            var folder = path_1.default.dirname(extractPath);
-            var fullPath = path_1.default.join(folder, "mage.exe");
-            fs_1.default.renameSync(extractPath, fullPath);
-            cacheDir = await tc.cacheDir(folder, toolName, "latest");
+            const extractPath = osPlat == "win32" ? await tc.extractZip(downloadPath) : await tc.extractTar(downloadPath);
+            cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
             core.addPath(cacheDir);
             console.log("tools cache has been updated with the path:", cacheDir);
             break;
