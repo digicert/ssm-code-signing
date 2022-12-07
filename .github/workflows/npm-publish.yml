@@ -33,7 +33,6 @@ jobs:
           jarsigner --help
           nuget --version
           mage --version
-          
         shell: cmd  
         
       - name: Verify installation
