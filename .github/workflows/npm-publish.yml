@@ -31,8 +31,8 @@ jobs:
           smctl sign
           apksigner version
           jarsigner --help
-          nuget --version
-          mage --version
+          nuget --help
+          mage --help
         shell: cmd  
         
       - name: Verify installation
