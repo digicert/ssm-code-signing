@@ -10,7 +10,7 @@ import fs from 'fs'
 import * as child_process from 'child_process'
 import * as exec from "@actions/exec"
 const signtools=["smctl",'signtool','nuget','mage','apksigner','jarsigner']
-const toolInstaller=async (toolPath:string,toolName:any)=>{
+const toolInstaller=async (toolPath:string,toolName:string="")=>{
    let cacheDir;
   switch(toolName){
   case 'smctl':
@@ -38,11 +38,11 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
      core.debug(`Cached Tool Dir ${cacheDir}`);
      break;                
      case 'mage':
-      const downloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+      const magedownloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
       let downloadPath = '';
 
   try {
-    downloadPath = await tc.downloadTool(downloadUrl);
+    downloadPath = await tc.downloadTool(magedownloadUrl);
   } catch (err:any) {
     core.debug(err);
 
@@ -56,15 +56,31 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
      console.log("tools cache has been updated with the path:", cacheDir);
      break;                
      case 'apksigner':
-      exec.exec
-      cacheDir=await tc.cacheDir(toolPath,toolName,"latest")
-     core.addPath(cacheDir);
-     console.log("tools cache has been updated with the path:", cacheDir);
+      const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || '30.0.2';
+      const androidHome = process.env.ANDROID_HOME;
+      if (!androidHome) {
+          core.error("require ANDROID_HOME to be execute");
+          throw new Error("ANDROID_HOME is null");
+      }
+      const buildTools = path.join(androidHome, `build-tools/${buildToolsVersion}`);
+      if (!fs.existsSync(buildTools)) {
+          core.error(`Couldnt find the Android build tools @ ${buildTools}`)
+      }
+      
+      const zipAlign = path.join(buildTools, 'zipalign');
+      core.debug(`Found 'zipalign' @ ${zipAlign}`);
+      core.debug("Signing APK file");
+      // find apksigner path
+      const apkSigner = path.join(buildTools, 'apksigner');
+      core.debug(`Found 'apksigner' @ ${apkSigner}`); 
+      core.debug("Verifying Signed APK");
+      const toolcache=await tc.cacheDir(buildTools,'apksigner','0.9')
+      core.addPath(toolcache)      
      break;                
      case 'jarsigner':
-      cacheDir=await tc.cacheDir(toolPath,toolName,"latest")
-     core.addPath(cacheDir);
-     console.log("tools cache has been updated with the path:", cacheDir);
+      const jarSignerPath = await io.which('jarsigner', true);
+      core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
+      core.addPath(jarSignerPath)     
      break;                
      
 
@@ -73,94 +89,26 @@ const toolInstaller=async (toolPath:string,toolName:any)=>{
 
   }
   
-  if(toolName!="smctl" || toolName!="signtool"){
-    
-  }
-  
 }
 
-function findToolInPath(pathForTool: string, tool: string) {
-  const patterns = `${pathForTool}\\${tool}.jar`;
-  globber
-    .create(patterns)
-    .then((globber: any) => {
-      return globber.glob();
-    })
-    .then((files: any) => {
-      return files && files.length > 0 ? files[0] : undefined;
-    })
-    .catch((err) => {
-      console.error("***", err);
-    });
-  return undefined;
-}
 
 async function run(){
 try {
-//   const resolvedVersion = "1.31.0";
-  
-  const apk="C://Program Files (x86)//Android//android-sdk//build-tools//29.0.3//lib//";  
-//   process.env.SHOULD_CHECK_INSTALLED = "false";
-//   const result=await main("keypair-signing")
-//   const message = JSON.parse(result);
-//       if (message) {
-//         core.setOutput("extractPath", message.imp_file_paths.extractPath);
-//         core.addPath(message.imp_file_paths.extractPath);
-//         tc.cacheDir(
-//           message.imp_file_paths.extractPath,
-//           "smctl",
-//           resolvedVersion
-//         ).then((response) => {
-//           console.log("tools cache has been updated with the path:", response);
-//         });
-//         exec.exec(`${apk}\\apksigner.bat`)
-//         exec.exec(`apksigner`)
-//         tc.cacheDir(apk,"zipalign", "latest").then((response) => {
-//           core.addPath(response);
-//           console.log("tools cache has been updated with the path:", response);
-//         });
-        
-
-// child_process.exec(`${apk}\\apksigner.bat`, function(error, stdout, stderr) {
-//     console.log(stdout);
-// });
-//         tc.cacheDir(apk,"apksigner", "latest").then((response) => {
-//           core.addPath(response);
-//           console.log("tools cache has been updated with the path:", response);
-//         });
-//         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-//       } else {
-//         core.setFailed("Installation Failed");
-//       }
+  process.env.SHOULD_CHECK_INSTALLED = "false";
+  const result=await main("keypair-signing")
+  const message = JSON.parse(result);
+      if (message) {
+        core.setOutput("extractPath", message.imp_file_paths.extractPath);
+        signtools.map(sgtool=>(sgtool=="smctl")?toolInstaller(sgtool,message.imp_file_paths.extractPath):toolInstaller(sgtool))
+        core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
+      } else {
+        core.setFailed("Installation Failed");
+      }
 core.debug("Zipaligning APK file");
 
 // Find zipalign executable
-const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || '30.0.2';
-const androidHome = process.env.ANDROID_HOME;
-if (!androidHome) {
-    core.error("require ANDROID_HOME to be execute");
-    throw new Error("ANDROID_HOME is null");
-}
-const buildTools = path.join(androidHome, `build-tools/${buildToolsVersion}`);
-if (!fs.existsSync(buildTools)) {
-    core.error(`Couldnt find the Android build tools @ ${buildTools}`)
-}
 
-const zipAlign = path.join(buildTools, 'zipalign');
-core.debug(`Found 'zipalign' @ ${zipAlign}`);
-core.debug("Signing APK file");
-// find apksigner path
-const apkSigner = path.join(buildTools, 'apksigner');
-core.debug(`Found 'apksigner' @ ${apkSigner}`); 
-core.debug("Verifying Signed APK");
-const toolcache=await tc.cacheDir(buildTools,'apksigner','0.9')
-core.addPath(toolcache)
-const jarSignerPath = await io.which('jarsigner', true);
-core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
-core.addPath(jarSignerPath)
-await exec.exec(`"${apkSigner}"`, [
-    'version'
-]);
+
 
   
 } catch (error: any) {
