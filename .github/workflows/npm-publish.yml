@@ -40,7 +40,13 @@ jobs:
           nuget --help
           mage --help
         shell: cmd     
-        
+      
+      - if: matrix.os=='ubuntu-latest'   
+        run: | 
+          jarsigner --help
+          nuget --help
+          mage --help
+        shell: bash     
       - name: Verify installation
         run: |
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
