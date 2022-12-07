@@ -39,8 +39,8 @@ const toolInstaller=async (toolName:string,toolPath:string="")=>{
      core.debug(`Cached Tool Dir ${cacheDir}`);
      break;                
      case "mage":
-      const magedownloadUrl =(osPlat=="win32")? `https://github.com/magefile/mage/releases/download/v1.14.0/
-      mage_1.14.0_Windows-64bit.zip `:`https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+      const magedownloadUrl =(osPlat=="win32")? `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip `
+      :`https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
       let downloadPath = '';
 
   try {
