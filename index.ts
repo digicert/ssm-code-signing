@@ -51,7 +51,10 @@ const toolInstaller=async (toolName:string,toolPath:string="")=>{
 
   // Extract tar
   const extractPath = await tc.extractTar(downloadPath);
-      cacheDir=await tc.cacheDir(extractPath,toolName,"latest")
+  var folder = path.dirname(extractPath);
+    var fullPath = path.join(folder, "mage.exe");
+    fs.renameSync(extractPath, fullPath);
+      cacheDir=await tc.cacheDir(folder,toolName,"latest")
      core.addPath(cacheDir);
      console.log("tools cache has been updated with the path:", cacheDir);
      break;                
