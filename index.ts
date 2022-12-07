@@ -10,7 +10,7 @@ import fs from 'fs'
 import * as child_process from 'child_process'
 import * as exec from "@actions/exec"
 const signtools=["smctl",'signtool','nuget','mage','apksigner','jarsigner']
-const toolInstaller=async (toolPath:string,toolName:string="")=>{
+const toolInstaller=async (toolName:string,toolPath:string="")=>{
    let cacheDir;
   switch(toolName){
   case "smctl":

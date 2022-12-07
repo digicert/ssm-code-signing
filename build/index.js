@@ -32439,7 +32439,7 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const signtools = ["smctl", 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner'];
-const toolInstaller = async (toolPath, toolName = "") => {
+const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
         case "smctl":
