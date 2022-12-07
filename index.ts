@@ -13,19 +13,19 @@ const signtools=["smctl",'signtool','nuget','mage','apksigner','jarsigner']
 const toolInstaller=async (toolPath:string,toolName:string="")=>{
    let cacheDir;
   switch(toolName){
-  case 'smctl':
+  case "smctl":
                 cacheDir=await tc.cacheDir(toolPath,toolName,"latest")
                 core.addPath(cacheDir);
                 console.log("tools cache has been updated with the path:", cacheDir);
                 break;
-  case 'signtool':
+  case "signtool":
     const sign =
     "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";   
   cacheDir=await tc.cacheDir(sign,toolName,"latest")
     core.addPath(cacheDir);
     console.log("tools cache has been updated with the path:", cacheDir);
     break;                
-    case 'nuget':
+    case "nuget":
       core.debug("Downloading Nuget tool");
     const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
 
@@ -37,7 +37,7 @@ const toolInstaller=async (toolPath:string,toolName:string="")=>{
      core.addPath(cacheDir);
      core.debug(`Cached Tool Dir ${cacheDir}`);
      break;                
-     case 'mage':
+     case "mage":
       const magedownloadUrl = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
       let downloadPath = '';
 
@@ -55,7 +55,7 @@ const toolInstaller=async (toolPath:string,toolName:string="")=>{
      core.addPath(cacheDir);
      console.log("tools cache has been updated with the path:", cacheDir);
      break;                
-     case 'apksigner':
+     case "apksigner":
       const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || '30.0.2';
       const androidHome = process.env.ANDROID_HOME;
       if (!androidHome) {
@@ -77,7 +77,7 @@ const toolInstaller=async (toolPath:string,toolName:string="")=>{
       const toolcache=await tc.cacheDir(buildTools,'apksigner','0.9')
       core.addPath(toolcache)      
      break;                
-     case 'jarsigner':
+     case "jarsigner":
       const jarSignerPath = await io.which('jarsigner', true);
       core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
       core.addPath(jarSignerPath)     
