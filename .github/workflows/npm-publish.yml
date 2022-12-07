@@ -44,8 +44,8 @@ jobs:
       - if: matrix.os=='ubuntu-latest'   
         run: | 
           jarsigner --help
-          nuget sign
-          mage -versiion
+          nuget -Help 
+          mage -version
         shell: bash     
       - name: Verify installation
         run: |
