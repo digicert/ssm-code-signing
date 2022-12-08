@@ -28,7 +28,7 @@ jobs:
       - if: matrix.os=='windows-latest'   
         run: | 
           smctl windows ksp list
-          smctl gpg --sign
+          gpg --sign
           apksigner version
           jarsigner --help
           nuget --help
