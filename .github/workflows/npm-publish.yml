@@ -28,7 +28,7 @@ jobs:
       - if: matrix.os=='windows-latest'   
         run: | 
           smctl windows ksp list
-          gpg --card-status./ssm-scd-darwin-amd64 
+          ssm-scd --card-status./ssm-scd-darwin-amd64 
           apksigner version
           jarsigner --help
           nuget --help
