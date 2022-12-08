@@ -32440,7 +32440,7 @@ const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const osPlat = os_1.default.platform();
-const signtools = ["smctl", 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner'];
+const signtools = ['smctl', 'sm-scd', 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner'];
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
@@ -32450,8 +32450,15 @@ const toolInstaller = async (toolName, toolPath = "") => {
             console.log("tools cache has been updated with the path:", cacheDir);
             break;
         case "signtool":
-            const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-            cacheDir = await tc.cacheDir(sign, toolName, "latest");
+            if (osPlat == "win32") {
+                const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
+                cacheDir = await tc.cacheDir(sign, toolName, "latest");
+                core.addPath(cacheDir);
+                console.log("tools cache has been updated with the path:", cacheDir);
+            }
+            break;
+        case "sm-scd":
+            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
             core.addPath(cacheDir);
             console.log("tools cache has been updated with the path:", cacheDir);
             break;
@@ -32520,7 +32527,7 @@ async function run() {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
             signtools.map(async (sgtool) => {
-                if (sgtool == "smctl") {
+                if (sgtool == "smctl" || sgtool == "sm-scd") {
                     console.log("***");
                     await toolInstaller(sgtool, message.imp_file_paths.extractPath);
                 }

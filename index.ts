@@ -1,16 +1,13 @@
 import { main } from "@digicert/ssm-client-tools-installer";
 import * as core from "@actions/core";
 import * as tc from "@actions/tool-cache";
-import * as tl from "azure-pipelines-task-lib/task";
 import path from "path";
-import * as semver from "semver";
-import * as globber from "@actions/glob";
 import * as io from "@actions/io"
 import fs from 'fs'
 import os from 'os'
 
 const osPlat: string = os.platform();
-const signtools=["smctl",'signtool','nuget','mage','apksigner','jarsigner']
+const signtools=['smctl','sm-scd','signtool','nuget','mage','apksigner','jarsigner']
 const toolInstaller=async (toolName:string,toolPath:string="")=>{
    let cacheDir;
   switch(toolName){
@@ -20,12 +17,17 @@ const toolInstaller=async (toolName:string,toolPath:string="")=>{
                 console.log("tools cache has been updated with the path:", cacheDir);
                 break;
   case "signtool":
-    const sign =
+  if(osPlat=="win32") { const sign =
     "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";   
   cacheDir=await tc.cacheDir(sign,toolName,"latest")
     core.addPath(cacheDir);
-    console.log("tools cache has been updated with the path:", cacheDir);
-    break;                
+    console.log("tools cache has been updated with the path:", cacheDir);}
+    break;
+    case "sm-scd":   
+      cacheDir=await tc.cacheDir(toolPath,toolName,"latest")
+        core.addPath(cacheDir);
+        console.log("tools cache has been updated with the path:", cacheDir);
+        break;                  
     case "nuget":
       core.debug("Downloading Nuget tool");
     const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
@@ -104,7 +106,7 @@ try {
         core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
         
         signtools.map(async sgtool=>
-          {if(sgtool=="smctl")
+          {if(sgtool=="smctl" || sgtool=="sm-scd")
         {console.log("***")
          await toolInstaller(sgtool,message.imp_file_paths.extractPath)}
         else{
