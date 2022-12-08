@@ -7,7 +7,7 @@ import fs from 'fs'
 import os from 'os'
 
 const osPlat: string = os.platform();
-const signtools=['smctl','sm-scd','signtool','nuget','mage','apksigner','jarsigner']
+const signtools=['smctl','signtool','nuget','mage','apksigner','jarsigner']
 const toolInstaller=async (toolName:string,toolPath:string="")=>{
    let cacheDir;
   switch(toolName){
