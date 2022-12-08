@@ -28,7 +28,7 @@ jobs:
       - if: matrix.os=='windows-latest'   
         run: | 
           smctl windows ksp list
-          ssm-scd keypair generate smctl_gpg_master --key-alg "ECDSA" --curve "P256"  --can-sign "YES" --gpg-key-type "MASTER" --uids "name=useridsmctl1,email=name@digicert.com name=useridsmctl2,email=name@digicert.com" 
+          ssm-scd --signing 
           apksigner version
           jarsigner --help
           nuget --help
