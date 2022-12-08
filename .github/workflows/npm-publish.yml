@@ -27,8 +27,7 @@ jobs:
       - run: smctl -v  
       - if: matrix.os=='windows-latest'   
         run: | 
-          smctl windows ksp list
-          ssm-scd --signing 
+          smctl gpg --signing 
           apksigner version
           jarsigner --help
           nuget --help
