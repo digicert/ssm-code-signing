@@ -32440,15 +32440,17 @@ const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const osPlat = os_1.default.platform();
-const signtools = [
-    "smctl",
-    "ssm-scd",
-    "signtool",
-    "nuget",
-    "mage",
-    "apksigner",
-    "jarsigner",
-];
+const signtools = osPlat == "win32"
+    ? [
+        "smctl",
+        "ssm-scd",
+        "signtool",
+        "nuget",
+        "mage",
+        "apksigner",
+        "jarsigner",
+    ]
+    : ["smctl", "ssm-scd", "nuget", "mage", "apksigner"];
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
@@ -32458,12 +32460,10 @@ const toolInstaller = async (toolName, toolPath = "") => {
             core.info(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "signtool":
-            if (osPlat == "win32") {
-                const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
-                cacheDir = await tc.cacheDir(sign, toolName, "latest");
-                core.addPath(cacheDir);
-                core.info(`tools cache has been updated with the path: ${cacheDir}`);
-            }
+            const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
+            cacheDir = await tc.cacheDir(sign, toolName, "latest");
+            core.addPath(cacheDir);
+            core.info(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "ssm-scd":
             console.log("toolpath", toolPath);
@@ -32535,7 +32535,7 @@ const toolInstaller = async (toolName, toolPath = "") => {
         if (message) {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-            signtools.map(async (sgtool) => (await ((sgtool == "smctl") || (sgtool == "ssm=scd")))
+            signtools.map(async (sgtool) => (await (sgtool == "smctl" || sgtool == "ssm=scd"))
                 ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
                 : toolInstaller(sgtool));
         }
