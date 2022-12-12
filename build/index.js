@@ -32465,11 +32465,12 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 core.info(`tools cache has been updated with the path: ${cacheDir}`);
             }
             break;
-        // case "ssm-scd":
-        //   cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-        //   core.addPath(cacheDir);
-        //   core.info(`tools cache has been updated with the path: ${cacheDir}`);
-        //   break;
+        case "ssm-scd":
+            console.log("toolpath", toolPath);
+            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+            core.addPath(cacheDir);
+            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            break;
         case "nuget":
             core.debug("Downloading Nuget tool");
             const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
@@ -32534,7 +32535,7 @@ const toolInstaller = async (toolName, toolPath = "") => {
         if (message) {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-            signtools.map(async (sgtool) => (await (sgtool == "smctl" || sgtool == "ssm=scd"))
+            signtools.map(async (sgtool) => (await ((sgtool == "smctl") || (sgtool == "ssm=scd")))
                 ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
                 : toolInstaller(sgtool));
         }
