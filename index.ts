@@ -35,7 +35,6 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
       core.info(`tools cache has been updated with the path: ${cacheDir}`);
       break;
     case "ssm-scd":
-      console.log("toolpath", toolPath);
       cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
       core.addPath(cacheDir);
       core.info(`tools cache has been updated with the path: ${cacheDir}`);
@@ -113,11 +112,10 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
     if (message) {
       core.setOutput("extractPath", message.imp_file_paths.extractPath);
       core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-      signtools.map(async (sgtool) =>{
-       if(sgtool == "smctl" || sgtool == "ssm=scd")
-        await   toolInstaller(sgtool, message.imp_file_paths.extractPath)
-          else await toolInstaller(sgtool)
-      }
+      signtools.map(async (sgtool) =>
+        (await (sgtool == "smctl" || sgtool == "ssm-scd"))
+          ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
+          : toolInstaller(sgtool)
       );
     } else {
       core.setFailed("Installation Failed");
