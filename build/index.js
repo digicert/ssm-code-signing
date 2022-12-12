@@ -32440,7 +32440,15 @@ const io = __importStar(__nccwpck_require__(7436));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const osPlat = os_1.default.platform();
-const signtools = ['smctl', 'ssm-scd', 'signtool', 'nuget', 'mage', 'apksigner', 'jarsigner'];
+const signtools = [
+    "smctl",
+    "ssm-scd",
+    "signtool",
+    "nuget",
+    "mage",
+    "apksigner",
+    "jarsigner",
+];
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
@@ -32474,9 +32482,10 @@ const toolInstaller = async (toolName, toolPath = "") => {
             core.debug(`Cached Tool Dir ${cacheDir}`);
             break;
         case "mage":
-            const magedownloadUrl = (osPlat == "win32") ? `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip `
+            const magedownloadUrl = osPlat == "win32"
+                ? `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip `
                 : `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
-            let downloadPath = '';
+            let downloadPath = "";
             try {
                 downloadPath = await tc.downloadTool(magedownloadUrl);
             }
@@ -32485,13 +32494,15 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 throw new Error(`failed to download Mage v: ${err.message}`);
             }
             // Extract tar
-            const extractPath = osPlat == "win32" ? await tc.extractZip(downloadPath) : await tc.extractTar(downloadPath);
+            const extractPath = osPlat == "win32"
+                ? await tc.extractZip(downloadPath)
+                : await tc.extractTar(downloadPath);
             cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
             core.addPath(cacheDir);
             console.log("tools cache has been updated with the path:", cacheDir);
             break;
         case "apksigner":
-            const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || '30.0.2';
+            const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || "30.0.2";
             const androidHome = process.env.ANDROID_HOME;
             if (!androidHome) {
                 core.error("require ANDROID_HOME to be execute");
@@ -32501,24 +32512,21 @@ const toolInstaller = async (toolName, toolPath = "") => {
             if (!fs_1.default.existsSync(buildTools)) {
                 core.error(`Couldnt find the Android build tools @ ${buildTools}`);
             }
-            const zipAlign = path_1.default.join(buildTools, 'zipalign');
-            core.debug(`Found 'zipalign' @ ${zipAlign}`);
-            core.debug("Signing APK file");
             // find apksigner path
-            const apkSigner = path_1.default.join(buildTools, 'apksigner');
+            const apkSigner = path_1.default.join(buildTools, "apksigner");
             core.debug(`Found 'apksigner' @ ${apkSigner}`);
             core.debug("Verifying Signed APK");
-            const toolcache = await tc.cacheDir(buildTools, 'apksigner', '0.9');
+            const toolcache = await tc.cacheDir(buildTools, "apksigner", "0.9");
             core.addPath(toolcache);
             break;
         case "jarsigner":
-            const jarSignerPath = await io.which('jarsigner', true);
+            const jarSignerPath = await io.which("jarsigner", true);
             core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
             core.addPath(jarSignerPath);
             break;
     }
 };
-async function run() {
+(async () => {
     try {
         process.env.SHOULD_CHECK_INSTALLED = "false";
         const result = await (0, ssm_client_tools_installer_1.main)("keypair-signing");
@@ -32526,27 +32534,18 @@ async function run() {
         if (message) {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-            signtools.map(async (sgtool) => {
-                if (sgtool == "smctl" || sgtool == "ssm-scd") {
-                    console.log("***");
-                    await toolInstaller(sgtool, message.imp_file_paths.extractPath);
-                }
-                else {
-                    await toolInstaller(sgtool);
-                }
-            });
+            signtools.map(async (sgtool) => (await (sgtool == "smctl" || sgtool == "ssm=scd"))
+                ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
+                : toolInstaller(sgtool));
         }
         else {
             core.setFailed("Installation Failed");
         }
-        core.debug("Zipaligning APK file");
-        // Find zipalign executable
     }
     catch (error) {
         core.setFailed(error.message);
     }
-}
-run();
+})();
 
 
 /***/ }),

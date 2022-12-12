@@ -24,28 +24,23 @@ jobs:
           npm ci
           npm run build
           npm  start
-      - run: smctl -v  
-      - if: matrix.os=='windows-latest'   
-        run: | 
-          smctl windows ksp list
-          gpg --card-status./ssm-scd-darwin-amd64 
+      - run: smctl -v
+      - if: matrix.os=='windows-latest'
+        run: |
+          smctl windows ksp list 
           apksigner version
-          jarsigner --help
-          nuget --help
-          mage --help
-        shell: cmd  
-      - if: matrix.os=='windows-latest'   
-        run: | 
+        shell: cmd
+      - if: matrix.os=='windows-latest'
+        run: |
           jarsigner --help
           mage -version
-          nuget sign
-        shell: cmd     
-      
-      - if: matrix.os=='ubuntu-latest'   
-        run: | 
+        shell: cmd
+
+      - if: matrix.os=='ubuntu-latest'
+        run: |
           jarsigner --help
           mage -version
-        shell: bash     
+        shell: bash
       - name: Verify installation
         run: |
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
