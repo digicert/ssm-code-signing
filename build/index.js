@@ -32535,9 +32535,12 @@ const toolInstaller = async (toolName, toolPath = "") => {
         if (message) {
             core.setOutput("extractPath", message.imp_file_paths.extractPath);
             core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
-            signtools.map(async (sgtool) => (await (sgtool === "smctl" || sgtool === "ssm=scd"))
-                ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
-                : toolInstaller(sgtool));
+            signtools.map(async (sgtool) => {
+                if (sgtool == "smctl" || sgtool == "ssm=scd")
+                    await toolInstaller(sgtool, message.imp_file_paths.extractPath);
+                else
+                    await toolInstaller(sgtool);
+            });
         }
         else {
             core.setFailed("Installation Failed");
