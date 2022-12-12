@@ -32457,18 +32457,18 @@ const toolInstaller = async (toolName, toolPath = "") => {
         case "smctl":
             cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
             core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "signtool":
             const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
             cacheDir = await tc.cacheDir(sign, toolName, "latest");
             core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "ssm-scd":
             cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
             core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "nuget":
             core.debug("Downloading Nuget tool");
@@ -32479,7 +32479,7 @@ const toolInstaller = async (toolName, toolPath = "") => {
             fs_1.default.renameSync(nugetPath, fullPath);
             cacheDir = await tc.cacheDir(folder, toolName, "latest");
             core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "mage":
             const magedownloadUrl = osPlat == "win32"
@@ -32499,7 +32499,7 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 : await tc.extractTar(downloadPath);
             cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
             core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
+            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
         case "apksigner":
             const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || "30.0.2";
