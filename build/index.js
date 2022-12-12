@@ -32465,11 +32465,11 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 core.info(`tools cache has been updated with the path: ${cacheDir}`);
             }
             break;
-        case "ssm-scd":
-            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-            core.addPath(cacheDir);
-            core.info(`tools cache has been updated with the path: ${cacheDir}`);
-            break;
+        // case "ssm-scd":
+        //   cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+        //   core.addPath(cacheDir);
+        //   core.info(`tools cache has been updated with the path: ${cacheDir}`);
+        //   break;
         case "nuget":
             core.debug("Downloading Nuget tool");
             const nugetPath = await tc.downloadTool("https://dist.nuget.org/win-x86-commandline/latest/nuget.exe");
