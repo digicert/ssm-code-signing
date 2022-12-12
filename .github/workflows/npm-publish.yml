@@ -18,6 +18,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - run: apsigner version    
       - name: Install Secure Software Manager client tools
         id: SSMClientToolsSetup
         run: |
