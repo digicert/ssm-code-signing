@@ -114,7 +114,7 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
       core.setOutput("extractPath", message.imp_file_paths.extractPath);
       core.setOutput("PKCS11_CONFIG", message.imp_file_paths.PKCS11_CONFIG);
       signtools.map(async (sgtool) =>
-        (await (sgtool == "smctl" || sgtool == "ssm=scd"))
+        (await (sgtool === "smctl" || sgtool === "ssm=scd"))
           ? toolInstaller(sgtool, message.imp_file_paths.extractPath)
           : toolInstaller(sgtool)
       );
