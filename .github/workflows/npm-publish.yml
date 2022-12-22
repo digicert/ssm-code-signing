@@ -9,7 +9,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest ,macos-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -31,12 +31,6 @@ jobs:
           cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
           echo "Tools installed are ..."
           ls
-      - if: matrix.os=='windows-latest'
-        name: Verify installation
-        run: |
-          echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
-          cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
-          echo "Tools installed are ..."
-          dir    
+
     env:
       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
