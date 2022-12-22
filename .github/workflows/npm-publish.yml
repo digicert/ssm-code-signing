@@ -30,6 +30,13 @@ jobs:
           echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
           cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
           echo "Tools installed are ..."
-          dir
+          ls
+      - if: matrix.os=='windows-latest'
+        name: Verify installation
+        run: |
+          echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
+          cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
+          echo "Tools installed are ..."
+          dir    
     env:
       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
