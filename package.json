@@ -1,7 +1,7 @@
 {
   "name": "ssm-github-actions",
   "version": "1.0.0",
-  "description": "SSM Github actions marketplace app",
+  "description": "STM Github actions marketplace app",
   "main": "build/index.js",
   "scripts": {
     "start": "node ./build/index.js",
