@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install Secure Software Manager client tools
+      - name: Install Software Trust Manager client tools
         id: STMClientToolsSetup
         run: |
           npm ci
