@@ -18,8 +18,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - name: Install Secure Software Manager client tools
-        id: SSMClientToolsSetup
+      - name: Install Software Trust Manager client tools
+        id: STMClientToolsSetup
         run: |
           npm ci
           npm run build
@@ -27,8 +27,8 @@ jobs:
 
       - name: Verify installation
         run: |
-          echo "The PKCS11 is installed at ${{steps.SSMClientToolsSetup.outputs.PKCS11_CONFIG}}"
-          cd "${{ steps.SSMClientToolsSetup.outputs.extractPath }}"
+          echo "The PKCS11 is installed at ${{steps.STMClientToolsSetup.outputs.PKCS11_CONFIG}}"
+          cd "${{ steps.STMClientToolsSetup.outputs.extractPath }}"
           echo "Tools installed are ..."
           ls
 
