@@ -72,4 +72,4 @@ For comprehensive documentation, refer to:
 [Contact DigiCert](https://www.digicert.com/contact-us)
 
 ## Learn more
-To learn more about centralizing and automating your code signing workflows with Software Trust Manager, reach out to [Sales/Enquiry](mailto:sales@digicert.com) or visit: http://www.digicert.com/signing/software-trust-manager.
+To learn more about centralizing and automating your code signing workflows with Software Trust Manager, reach out to [Sales/Enquiry](mailto:sales@digicert.com) or visit: https://www.digicert.com/signing/secure-software-manager.
