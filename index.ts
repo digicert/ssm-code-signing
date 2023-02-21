@@ -106,6 +106,7 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
 
 (async () => {
   try {
+    console.log("installer to install ssm code signing tools created");
     process.env.SHOULD_CHECK_INSTALLED = "false";
     const result = await main("keypair-signing");
     const message = JSON.parse(result);
@@ -120,6 +121,7 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
     } else {
       core.setFailed("Installation Failed");
     }
+    console.log("installer to install ssm code signing tools completed");
   } catch (error: any) {
     core.setFailed(error.message);
   }
