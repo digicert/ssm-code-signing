@@ -2,7 +2,7 @@
 name: "Code signing with Software Trust Manager"
 description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
 runs:
-  using: "node16"
+  using: "node20"
   main: "./build/index.js"
 branding:
   icon: "check-circle"
