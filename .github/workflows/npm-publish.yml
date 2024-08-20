@@ -3,7 +3,10 @@
 
 name: SSMClientToolsSetup
 
-on: push
+on:
+  push:
+    branches:
+      - node20_update
 
 jobs:
   build:
@@ -15,9 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
       - name: Install Software Trust Manager client tools
         id: STMClientToolsSetup
         run: |
