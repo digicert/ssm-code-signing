@@ -6,7 +6,7 @@ name: SSMClientToolsSetup
 on:
   push:
     branches:
-      - node20_update
+      - master
 
 jobs:
   build:
