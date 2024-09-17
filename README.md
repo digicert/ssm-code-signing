@@ -33,13 +33,13 @@ You require a DigiCert ONE account to access Software Trust Manager. If you do n
 - [Signing Manager Controller (SMCTL)](https://docs.digicert.com/en/software-trust-manager/tools/signing-tools/smctl.html)
 SMCTL provides a Command Line Interface (CLI) that facilitates manual or automated private key, certificate management, and signing with or without the need for human intervention.
 
-[PKCS11 library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/pkcs11-library.html)
+- [PKCS11 library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/pkcs11-library.html)
 The PKCS11 library handles secure key generation, application hash signing, and associated certificate-related requirements when the signing request does not require the transportation of files and intellectual property.
 
-[KSP library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/ksp.html)
+- [KSP library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/ksp.html)
 DigiCert​​®​​ Software Trust Manager KSP is a Microsoft CNG (Cryptographic: Next Generation) library-based client-side tool
 
-[JCE library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/jce.html)
+- [JCE library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/jce.html)
 The JCE library is used for signing with Jarsigner and integrates with any operating system that supports Java.
 
 ## Use cases
