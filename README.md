@@ -2,7 +2,7 @@
 
 Code Signing with Software Trust Manager GitHub action is a streamlined keypair-based signing workflow that improves software security and seamlessly integrates with DevOps processes to sign binaries on **Windows** and **Linux**.
 
-This action accelerates the installation and configuration of clients and various signing tools to help developers become signing-ready for GitHub action workflows.
+This GitHub action automates the installation and configuration of Software Trust Manager client tools, enabling developers to quickly become signing-ready for GitHub action workflows.
 
 ## Software Trust Manager
 
@@ -28,6 +28,19 @@ DigiCert® Software Trust Manager provides a solution to manage and automate y
 Software Trust Manager is part of the DigiCert ONE platform, which also includes DigiCert® Trust Lifecycle Manager, DigiCert® Document Trust Manager, and DigiCert® IoT Trust Manager, enabling organizations to manage their diverse PKI workflows from a single pane of glass.
 
 You require a DigiCert ONE account to access Software Trust Manager. If you do not currently have a DigiCert ONE account, you can request a 30-day free trial account from [DigiCert Sales.](https://www.digicert.com/contact-us)
+
+## Which client tools will be installed and configured?
+- [Signing Manager Controller (SMCTL)](https://docs.digicert.com/en/software-trust-manager/tools/signing-tools/smctl.html)
+SMCTL provides a Command Line Interface (CLI) that facilitates manual or automated private key, certificate management, and signing with or without the need for human intervention.
+
+[PKCS11 library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/pkcs11-library.html)
+The PKCS11 library handles secure key generation, application hash signing, and associated certificate-related requirements when the signing request does not require the transportation of files and intellectual property.
+
+[KSP library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/ksp.html)
+DigiCert​​®​​ Software Trust Manager KSP is a Microsoft CNG (Cryptographic: Next Generation) library-based client-side tool
+
+[JCE library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/jce.html)
+The JCE library is used for signing with Jarsigner and integrates with any operating system that supports Java.
 
 ## Use cases
 
@@ -72,4 +85,4 @@ For comprehensive documentation, refer to:
 [Contact DigiCert](https://www.digicert.com/contact-us)
 
 ## Learn more
-To learn more about centralizing and automating your code signing workflows with Software Trust Manager, reach out to [Sales/Enquiry](mailto:sales@digicert.com) or visit: https://www.digicert.com/signing/secure-software-manager.
+To learn more about centralizing and automating your code signing workflows with Software Trust Manager, reach out to [Sales/Enquiry](mailto:sales@digicert.com) or visit: http://www.digicert.com/signing/software-trust-manager.
