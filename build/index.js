@@ -4147,7 +4147,7 @@ async function installLinuxTools(installationPath, toolToBeUsed, usecase, output
         .arg("+x")
         .arg(path_1.default.join(extractPath, "smctl"));
     const syncRetCode = await setExecutableFlagForSmctl.exec();
-    console.log("set executable flag for smctl " + syncRetCode);
+    console.log("set executable flag for smctl ", syncRetCode);
     let configFilePath = "";
     //pkcs11 library installation
     if (usecase != "gpg-signing") {
@@ -4215,7 +4215,7 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
         .arg("+x")
         .arg(path_1.default.join(extractPath, "smctl"));
     const syncRetCode = await setExecutableFlagForSmctl.exec();
-    console.log("set executable flag for smctl " + syncRetCode);
+    console.log("set executable flag for smctl ", syncRetCode);
     let configFilePath = "";
     //pkcs11 library installation
     if (usecase != "gpg-signing") {
@@ -4320,10 +4320,10 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
     //function extracts all tools and returns the installed path
     const extractPath = await (0, runwintools_1.runWinToolBasedInstallationOrExtraction)(toolToBeUsed, directoryPath, usecase);
     if (usecase == "gpg-signing") {
-        console.log("path where the stm tools were installed/extracted is ", directoryPath);
+        console.log("GPG signing: path where the stm tools were installed/extracted is ", directoryPath);
     }
     else {
-        console.log("path where the stm tools were installed/extracted is ", extractPath);
+        console.log("Keypair signing: path where the stm tools were installed/extracted is ", extractPath);
     }
     outputVar.imp_file_paths["directoryPath"] = directoryPath;
     outputVar.imp_file_paths["extractPath"] = extractPath;
@@ -4655,7 +4655,7 @@ exports.toolDownloaded = {
 };
 const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
     const urlToDownloadTool = `${exports.uiAPIPrefix}/releases/noauth/${toolToBeUsed}/download`;
-    console.log("Tool to be downloaded and used {} and url is {}", toolToBeUsed, urlToDownloadTool);
+    console.log(`Tool to be downloaded and used ${toolToBeUsed} and url is ${urlToDownloadTool}`);
     const toolFileData = await (0, exports.getAPICall)(urlToDownloadTool, {
         responseType: "arraybuffer",
     });
