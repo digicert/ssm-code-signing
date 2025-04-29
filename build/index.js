@@ -31723,7 +31723,7 @@ function buildProxyBypassRegexFromEnv(bypass) {
     }
     catch (err) {
         if (err instanceof SyntaxError && (bypass || "").startsWith("*")) {
-            let wildcardEscaped = bypass.replace('*', '(.*)');
+            let wildcardEscaped = bypass.replace(/\*/g, '(.*)');
             return new RegExp(wildcardEscaped, 'i');
         }
         throw err;
