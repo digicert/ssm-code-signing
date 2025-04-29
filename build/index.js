@@ -32492,6 +32492,7 @@ const signtools = osPlat == "win32"
         "jarsigner",
     ]
     : ["smctl", "ssm-scd", "nuget", "mage", "apksigner"];
+const winKitBasePath = "C:\\Program Files (x86)\\Windows Kits\\";
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
@@ -32502,6 +32503,13 @@ const toolInstaller = async (toolName, toolPath = "") => {
             break;
         case "signtool":
             const sign = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\10.0.17763.0\\x86\\";
+            if (fs_1.default.existsSync(winKitBasePath)) {
+                console.log('The WinKit directory exists.');
+                getAllFiles(winKitBasePath);
+            }
+            else {
+                console.log('The WinKit directory does not exist.');
+            }
             cacheDir = await tc.cacheDir(sign, toolName, "latest");
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
@@ -32567,6 +32575,11 @@ const toolInstaller = async (toolName, toolPath = "") => {
             break;
     }
 };
+function getAllFiles(dirPath) {
+    fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(files => {
+        console.log(files);
+    });
+}
 (async () => {
     try {
         process.env.SHOULD_CHECK_INSTALLED = "false";
