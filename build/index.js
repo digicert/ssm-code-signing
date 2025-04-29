@@ -32576,8 +32576,12 @@ const toolInstaller = async (toolName, toolPath = "") => {
     }
 };
 function getAllFiles(dirPath) {
-    fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(files => {
-        console.log(files);
+    fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(file => {
+        console.log(file);
+        if (file.name == "10") {
+            console.log(`Getting files from the dir: ${file.name}`);
+            getAllFiles(dirPath + file.name);
+        }
     });
 }
 (async () => {

@@ -114,8 +114,13 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
 };
 
 function getAllFiles(dirPath: any) {
-  fs.readdirSync(dirPath, {withFileTypes: true}).forEach(files => {
-    console.log(files);
+  fs.readdirSync(dirPath, {withFileTypes: true}).forEach(file => {
+    console.log(file);
+    if (file.name == "10") {
+      console.log(`Getting files from the dir: ${file.name}`);
+      getAllFiles(dirPath + file.name);
+    }
+    
   });
 }
 
