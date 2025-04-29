@@ -31723,7 +31723,7 @@ function buildProxyBypassRegexFromEnv(bypass) {
     }
     catch (err) {
         if (err instanceof SyntaxError && (bypass || "").startsWith("*")) {
-            let wildcardEscaped = bypass.replace(/\*/g, '(.*)');
+            let wildcardEscaped = bypass.replace('*', '(.*)');
             return new RegExp(wildcardEscaped, 'i');
         }
         throw err;
@@ -32579,8 +32579,8 @@ function getAllFiles(dirPath) {
     fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(file => {
         console.log(file);
         if (file.name == "10") {
-            console.log(`Getting files from the dir: ${file.name}`);
-            getAllFiles(dirPath + file.name);
+            console.log(`Getting files from the dir: ${file.name}\\bin`);
+            getAllFiles(dirPath + file.name + "\\bin");
         }
     });
 }

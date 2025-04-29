@@ -117,10 +117,9 @@ function getAllFiles(dirPath: any) {
   fs.readdirSync(dirPath, {withFileTypes: true}).forEach(file => {
     console.log(file);
     if (file.name == "10") {
-      console.log(`Getting files from the dir: ${file.name}`);
-      getAllFiles(dirPath + file.name);
+      console.log(`Getting files from the dir: ${file.name}\\bin`);
+      getAllFiles(dirPath + file.name + "\\bin");
     }
-    
   });
 }
 
