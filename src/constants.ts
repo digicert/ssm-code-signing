@@ -1,0 +1,13 @@
+export const WIN_KIT_BASE_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\";
+export const ARCH_TYPE_DIR = "\\x86\\";
+export const OS_PLATFORM_WIN = "win32";
+export const SIGN_TOOL_SMCTL = "smctl";
+export const SIGN_TOOL_SSM_SCD = "ssm-scd";
+export const SIGN_TOOL_SIGNTOOL = "signtool";
+export const SIGN_TOOL_NUGET = "nuget";
+export const SIGN_TOOL_MAGE = "mage";
+export const SIGN_TOOL_APKSIGNER = "apksigner";
+export const SIGN_TOOL_JARSIGNER = "jarsigner";
+export const NUGET_PATH = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
+export const DOWNLOAD_PATH_WIN_MAGE = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip`;
+export const DOWNLOAD_PATH_LINUX_MAGE = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
