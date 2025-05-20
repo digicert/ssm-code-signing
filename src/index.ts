@@ -10,20 +10,18 @@ import { SdkVersionUtils } from "./sdk-version-utils.js";
 
 const utils = new SdkVersionUtils();
 const osPlat: string = os.platform();
-const signtools =
-  osPlat == con.OS_PLATFORM_WIN
-    ? [con.SIGN_TOOL_SMCTL, con.SIGN_TOOL_SSM_SCD, con.SIGN_TOOL_SIGNTOOL, con.SIGN_TOOL_NUGET, con.SIGN_TOOL_MAGE, con.SIGN_TOOL_APKSIGNER, con.SIGN_TOOL_JARSIGNER]
-    : [con.SIGN_TOOL_SMCTL, con.SIGN_TOOL_SSM_SCD, con.SIGN_TOOL_NUGET, con.SIGN_TOOL_MAGE, con.SIGN_TOOL_APKSIGNER];
+const isWinPlatform = (osPlat == con.OS_PLATFORM_WIN) ? true : false;
+const signtools = isWinPlatform ? con.WIN_OS_TOOL_LIST : con.OTHER_OS_TOOL_LIST;
 const toolInstaller = async (toolName: string, toolPath: string = "") => {
   let cacheDir;
   switch (toolName) {
-    case con.SIGN_TOOL_SMCTL:
+    case con.SIGN_TOOL_SMCTL: {
       cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
       core.addPath(cacheDir);
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
       break;
-
-    case con.SIGN_TOOL_SIGNTOOL:
+    }
+    case con.SIGN_TOOL_SIGNTOOL: {
       var sign = ""; 
       if (fs.existsSync(con.WIN_KIT_BASE_PATH)) {
         console.log(`The WinKit directory exists!`);
@@ -42,14 +40,14 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
         console.log('The WinKit directory does not exist.');
       }
       break;
-
-    case con.SIGN_TOOL_SSM_SCD:
+    }
+    case con.SIGN_TOOL_SSM_SCD: {
       cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
       core.addPath(cacheDir);
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
       break;
-
-    case con.SIGN_TOOL_NUGET:
+    }
+    case con.SIGN_TOOL_NUGET: {
       core.debug("Downloading Nuget tool");
       const nugetPath = await tc.downloadTool(con.NUGET_PATH);
       // Rename the file which is a GUID without extension
@@ -60,10 +58,10 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
       core.addPath(cacheDir);
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
       break;
-
-    case con.SIGN_TOOL_MAGE:
+    }
+    case con.SIGN_TOOL_MAGE: {
       const magedownloadUrl =
-        osPlat == con.OS_PLATFORM_WIN ? con.DOWNLOAD_PATH_WIN_MAGE : con.DOWNLOAD_PATH_LINUX_MAGE;
+        isWinPlatform ? con.DOWNLOAD_PATH_WIN_MAGE : con.DOWNLOAD_PATH_LINUX_MAGE;
       let downloadPath = "";
       try {
         downloadPath = await tc.downloadTool(magedownloadUrl);
@@ -73,17 +71,16 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
         throw new Error(`failed to download Mage v: ${err.message}`);
       }
       // Extract tar
-      const extractPath =
-        osPlat == con.OS_PLATFORM_WIN
+      const extractPath = isWinPlatform
           ? await tc.extractZip(downloadPath)
           : await tc.extractTar(downloadPath);
       cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
       core.addPath(cacheDir);
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
       break;
-
-    case con.SIGN_TOOL_APKSIGNER:
-      const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || "30.0.2";
+    }
+    case con.SIGN_TOOL_APKSIGNER: {
+      const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || con.DEFAULT_ANDROID_BUID_TOOL_VERSION;
       const androidHome = process.env.ANDROID_HOME;
       if (!androidHome) {
         core.error("require ANDROID_HOME to be execute");
@@ -97,18 +94,19 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
         core.error(`Couldnt find the Android build tools @ ${buildTools}`);
       }
       // find apksigner path
-      const apkSigner = path.join(buildTools, "apksigner");
+      const apkSigner = path.join(buildTools, con.SIGN_TOOL_APKSIGNER);
       core.debug(`Found 'apksigner' @ ${apkSigner}`);
       core.debug("Verifying Signed APK");
-      const toolcache = await tc.cacheDir(buildTools, "apksigner", "0.9");
+      const toolcache = await tc.cacheDir(buildTools, con.SIGN_TOOL_APKSIGNER, "0.9");
       core.addPath(toolcache);
       break;
-
-    case con.SIGN_TOOL_JARSIGNER:
-      const jarSignerPath = await io.which("jarsigner", true);
+    }
+    case con.SIGN_TOOL_JARSIGNER: {
+      const jarSignerPath = await io.which(con.SIGN_TOOL_JARSIGNER, true);
       core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
       core.addPath(jarSignerPath);
       break;
+    }
   }
 };
 

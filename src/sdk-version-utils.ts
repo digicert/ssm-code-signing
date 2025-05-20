@@ -1,5 +1,13 @@
 import fs from "fs";
 
+const EXPRESSION_VERSION_DIR = /\d+\.\d+/;
+
+const EXPRESSION_GROUPED_FLOAT = /[,\.]\d{2}$/;
+
+const EXPRESSION_DIGIT = /(\d{2})$/;
+
+const EXPRESSION_NON_DIGIT = /[^0-9]/g;
+
 export class SdkVersionUtils {
 
     constructor() {}
@@ -13,14 +21,14 @@ export class SdkVersionUtils {
     } 
 
     public isVersionDirectory(str: any) {
-        return /\d+\.\d+/.test(str);
+        return EXPRESSION_VERSION_DIR.test(str);
     }
 
     public parseGroupedFloat(stringValue: string) {
         stringValue = stringValue.trim();
-        var result = stringValue.replace(/[^0-9]/g, '');
-        if (/[,\.]\d{2}$/.test(stringValue)) {
-            result = result.replace(/(\d{2})$/, '.$1');
+        var result = stringValue.replace(EXPRESSION_NON_DIGIT, '');
+        if (EXPRESSION_GROUPED_FLOAT.test(stringValue)) {
+            result = result.replace(EXPRESSION_DIGIT, '.$1');
         }
         return parseFloat(result);
     }
@@ -34,7 +42,6 @@ export class SdkVersionUtils {
       fs.readdirSync(dirPath, {withFileTypes: true}).forEach(file => {
         if(this.isVersionDirectory(file.name)){
           sdkVersions.push(file.name)
-          //console.debug(file.name);
         }
       });
       return sdkVersions;

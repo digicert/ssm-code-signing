@@ -36525,7 +36525,7 @@ function buildProxyBypassRegexFromEnv(bypass) {
     }
     catch (err) {
         if (err instanceof SyntaxError && (bypass || "").startsWith("*")) {
-            let wildcardEscaped = bypass.replace('*', '(.*)');
+            let wildcardEscaped = bypass.replace(/\*/g, '(.*)');
             return new RegExp(wildcardEscaped, 'i');
         }
         throw err;
@@ -37249,7 +37249,7 @@ function wrappy (fn, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.DOWNLOAD_PATH_LINUX_MAGE = exports.DOWNLOAD_PATH_WIN_MAGE = exports.NUGET_PATH = exports.SIGN_TOOL_JARSIGNER = exports.SIGN_TOOL_APKSIGNER = exports.SIGN_TOOL_MAGE = exports.SIGN_TOOL_NUGET = exports.SIGN_TOOL_SIGNTOOL = exports.SIGN_TOOL_SSM_SCD = exports.SIGN_TOOL_SMCTL = exports.OS_PLATFORM_WIN = exports.ARCH_TYPE_DIR = exports.WIN_KIT_BASE_PATH = void 0;
+exports.OTHER_OS_TOOL_LIST = exports.WIN_OS_TOOL_LIST = exports.DEFAULT_ANDROID_BUID_TOOL_VERSION = exports.DOWNLOAD_PATH_LINUX_MAGE = exports.DOWNLOAD_PATH_WIN_MAGE = exports.NUGET_PATH = exports.SIGN_TOOL_JARSIGNER = exports.SIGN_TOOL_APKSIGNER = exports.SIGN_TOOL_MAGE = exports.SIGN_TOOL_NUGET = exports.SIGN_TOOL_SIGNTOOL = exports.SIGN_TOOL_SSM_SCD = exports.SIGN_TOOL_SMCTL = exports.OS_PLATFORM_WIN = exports.ARCH_TYPE_DIR = exports.WIN_KIT_BASE_PATH = void 0;
 exports.WIN_KIT_BASE_PATH = "C:\\Program Files (x86)\\Windows Kits\\10\\bin\\";
 exports.ARCH_TYPE_DIR = "\\x86\\";
 exports.OS_PLATFORM_WIN = "win32";
@@ -37261,8 +37261,11 @@ exports.SIGN_TOOL_MAGE = "mage";
 exports.SIGN_TOOL_APKSIGNER = "apksigner";
 exports.SIGN_TOOL_JARSIGNER = "jarsigner";
 exports.NUGET_PATH = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
-exports.DOWNLOAD_PATH_WIN_MAGE = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip`;
-exports.DOWNLOAD_PATH_LINUX_MAGE = `https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz`;
+exports.DOWNLOAD_PATH_WIN_MAGE = "https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip";
+exports.DOWNLOAD_PATH_LINUX_MAGE = "https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz";
+exports.DEFAULT_ANDROID_BUID_TOOL_VERSION = "30.0.2";
+exports.WIN_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_SIGNTOOL, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE, exports.SIGN_TOOL_APKSIGNER, exports.SIGN_TOOL_JARSIGNER];
+exports.OTHER_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE, exports.SIGN_TOOL_APKSIGNER];
 
 
 /***/ }),
@@ -37310,18 +37313,18 @@ const con = __importStar(__nccwpck_require__(9042));
 const sdk_version_utils_js_1 = __nccwpck_require__(7796);
 const utils = new sdk_version_utils_js_1.SdkVersionUtils();
 const osPlat = os_1.default.platform();
-const signtools = osPlat == con.OS_PLATFORM_WIN
-    ? [con.SIGN_TOOL_SMCTL, con.SIGN_TOOL_SSM_SCD, con.SIGN_TOOL_SIGNTOOL, con.SIGN_TOOL_NUGET, con.SIGN_TOOL_MAGE, con.SIGN_TOOL_APKSIGNER, con.SIGN_TOOL_JARSIGNER]
-    : [con.SIGN_TOOL_SMCTL, con.SIGN_TOOL_SSM_SCD, con.SIGN_TOOL_NUGET, con.SIGN_TOOL_MAGE, con.SIGN_TOOL_APKSIGNER];
+const isWinPlatform = (osPlat == con.OS_PLATFORM_WIN) ? true : false;
+const signtools = isWinPlatform ? con.WIN_OS_TOOL_LIST : con.OTHER_OS_TOOL_LIST;
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
-        case con.SIGN_TOOL_SMCTL:
+        case con.SIGN_TOOL_SMCTL: {
             cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
-        case con.SIGN_TOOL_SIGNTOOL:
+        }
+        case con.SIGN_TOOL_SIGNTOOL: {
             var sign = "";
             if (fs_1.default.existsSync(con.WIN_KIT_BASE_PATH)) {
                 console.log(`The WinKit directory exists!`);
@@ -37339,12 +37342,14 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 console.log('The WinKit directory does not exist.');
             }
             break;
-        case con.SIGN_TOOL_SSM_SCD:
+        }
+        case con.SIGN_TOOL_SSM_SCD: {
             cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
-        case con.SIGN_TOOL_NUGET:
+        }
+        case con.SIGN_TOOL_NUGET: {
             core.debug("Downloading Nuget tool");
             const nugetPath = await tc.downloadTool(con.NUGET_PATH);
             // Rename the file which is a GUID without extension
@@ -37355,8 +37360,9 @@ const toolInstaller = async (toolName, toolPath = "") => {
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
-        case con.SIGN_TOOL_MAGE:
-            const magedownloadUrl = osPlat == con.OS_PLATFORM_WIN ? con.DOWNLOAD_PATH_WIN_MAGE : con.DOWNLOAD_PATH_LINUX_MAGE;
+        }
+        case con.SIGN_TOOL_MAGE: {
+            const magedownloadUrl = isWinPlatform ? con.DOWNLOAD_PATH_WIN_MAGE : con.DOWNLOAD_PATH_LINUX_MAGE;
             let downloadPath = "";
             try {
                 downloadPath = await tc.downloadTool(magedownloadUrl);
@@ -37366,15 +37372,16 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 throw new Error(`failed to download Mage v: ${err.message}`);
             }
             // Extract tar
-            const extractPath = osPlat == con.OS_PLATFORM_WIN
+            const extractPath = isWinPlatform
                 ? await tc.extractZip(downloadPath)
                 : await tc.extractTar(downloadPath);
             cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
             break;
-        case con.SIGN_TOOL_APKSIGNER:
-            const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || "30.0.2";
+        }
+        case con.SIGN_TOOL_APKSIGNER: {
+            const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || con.DEFAULT_ANDROID_BUID_TOOL_VERSION;
             const androidHome = process.env.ANDROID_HOME;
             if (!androidHome) {
                 core.error("require ANDROID_HOME to be execute");
@@ -37385,17 +37392,19 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 core.error(`Couldnt find the Android build tools @ ${buildTools}`);
             }
             // find apksigner path
-            const apkSigner = path_1.default.join(buildTools, "apksigner");
+            const apkSigner = path_1.default.join(buildTools, con.SIGN_TOOL_APKSIGNER);
             core.debug(`Found 'apksigner' @ ${apkSigner}`);
             core.debug("Verifying Signed APK");
-            const toolcache = await tc.cacheDir(buildTools, "apksigner", "0.9");
+            const toolcache = await tc.cacheDir(buildTools, con.SIGN_TOOL_APKSIGNER, "0.9");
             core.addPath(toolcache);
             break;
-        case con.SIGN_TOOL_JARSIGNER:
-            const jarSignerPath = await io.which("jarsigner", true);
+        }
+        case con.SIGN_TOOL_JARSIGNER: {
+            const jarSignerPath = await io.which(con.SIGN_TOOL_JARSIGNER, true);
             core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);
             core.addPath(jarSignerPath);
             break;
+        }
     }
 };
 (async () => {
@@ -37433,6 +37442,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SdkVersionUtils = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const EXPRESSION_VERSION_DIR = /\d+\.\d+/;
+const EXPRESSION_GROUPED_FLOAT = /[,\.]\d{2}$/;
+const EXPRESSION_DIGIT = /(\d{2})$/;
+const EXPRESSION_NON_DIGIT = /[^0-9]/g;
 class SdkVersionUtils {
     constructor() { }
     getLatestSdkVersion(sdkVersions) {
@@ -37442,13 +37455,13 @@ class SdkVersionUtils {
         return sdkVersions.indexOf(Math.max(...sdkVersions));
     }
     isVersionDirectory(str) {
-        return /\d+\.\d+/.test(str);
+        return EXPRESSION_VERSION_DIR.test(str);
     }
     parseGroupedFloat(stringValue) {
         stringValue = stringValue.trim();
-        var result = stringValue.replace(/[^0-9]/g, '');
-        if (/[,\.]\d{2}$/.test(stringValue)) {
-            result = result.replace(/(\d{2})$/, '.$1');
+        var result = stringValue.replace(EXPRESSION_NON_DIGIT, '');
+        if (EXPRESSION_GROUPED_FLOAT.test(stringValue)) {
+            result = result.replace(EXPRESSION_DIGIT, '.$1');
         }
         return parseFloat(result);
     }
@@ -37460,7 +37473,6 @@ class SdkVersionUtils {
         fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(file => {
             if (this.isVersionDirectory(file.name)) {
                 sdkVersions.push(file.name);
-                //console.debug(file.name);
             }
         });
         return sdkVersions;
