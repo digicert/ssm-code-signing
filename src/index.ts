@@ -79,28 +79,6 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
       break;
     }
-    case con.SIGN_TOOL_APKSIGNER: {
-      const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || con.DEFAULT_ANDROID_BUID_TOOL_VERSION;
-      const androidHome = process.env.ANDROID_HOME;
-      if (!androidHome) {
-        core.error("require ANDROID_HOME to be execute");
-        throw new Error("ANDROID_HOME is null");
-      }
-      const buildTools = path.join(
-        androidHome,
-        `build-tools/${buildToolsVersion}`
-      );
-      if (!fs.existsSync(buildTools)) {
-        core.error(`Couldnt find the Android build tools @ ${buildTools}`);
-      }
-      // find apksigner path
-      const apkSigner = path.join(buildTools, con.SIGN_TOOL_APKSIGNER);
-      core.debug(`Found 'apksigner' @ ${apkSigner}`);
-      core.debug("Verifying Signed APK");
-      const toolcache = await tc.cacheDir(buildTools, con.SIGN_TOOL_APKSIGNER, "0.9");
-      core.addPath(toolcache);
-      break;
-    }
     case con.SIGN_TOOL_JARSIGNER: {
       const jarSignerPath = await io.which(con.SIGN_TOOL_JARSIGNER, true);
       core.debug(`Found 'jarsigner' @ ${jarSignerPath}`);

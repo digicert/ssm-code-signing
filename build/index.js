@@ -36525,7 +36525,7 @@ function buildProxyBypassRegexFromEnv(bypass) {
     }
     catch (err) {
         if (err instanceof SyntaxError && (bypass || "").startsWith("*")) {
-            let wildcardEscaped = bypass.replace(/\*/g, '(.*)');
+            let wildcardEscaped = bypass.replace('*', '(.*)');
             return new RegExp(wildcardEscaped, 'i');
         }
         throw err;
@@ -37264,8 +37264,8 @@ exports.NUGET_PATH = "https://dist.nuget.org/win-x86-commandline/latest/nuget.ex
 exports.DOWNLOAD_PATH_WIN_MAGE = "https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Windows-64bit.zip";
 exports.DOWNLOAD_PATH_LINUX_MAGE = "https://github.com/magefile/mage/releases/download/v1.14.0/mage_1.14.0_Linux-64bit.tar.gz";
 exports.DEFAULT_ANDROID_BUID_TOOL_VERSION = "30.0.2";
-exports.WIN_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_SIGNTOOL, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE, exports.SIGN_TOOL_APKSIGNER, exports.SIGN_TOOL_JARSIGNER];
-exports.OTHER_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE, exports.SIGN_TOOL_APKSIGNER];
+exports.WIN_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_SIGNTOOL, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE, exports.SIGN_TOOL_JARSIGNER];
+exports.OTHER_OS_TOOL_LIST = [exports.SIGN_TOOL_SMCTL, exports.SIGN_TOOL_SSM_SCD, exports.SIGN_TOOL_NUGET, exports.SIGN_TOOL_MAGE];
 
 
 /***/ }),
@@ -37378,25 +37378,6 @@ const toolInstaller = async (toolName, toolPath = "") => {
             cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
             core.addPath(cacheDir);
             core.debug(`tools cache has been updated with the path: ${cacheDir}`);
-            break;
-        }
-        case con.SIGN_TOOL_APKSIGNER: {
-            const buildToolsVersion = process.env.BUILD_TOOLS_VERSION || con.DEFAULT_ANDROID_BUID_TOOL_VERSION;
-            const androidHome = process.env.ANDROID_HOME;
-            if (!androidHome) {
-                core.error("require ANDROID_HOME to be execute");
-                throw new Error("ANDROID_HOME is null");
-            }
-            const buildTools = path_1.default.join(androidHome, `build-tools/${buildToolsVersion}`);
-            if (!fs_1.default.existsSync(buildTools)) {
-                core.error(`Couldnt find the Android build tools @ ${buildTools}`);
-            }
-            // find apksigner path
-            const apkSigner = path_1.default.join(buildTools, con.SIGN_TOOL_APKSIGNER);
-            core.debug(`Found 'apksigner' @ ${apkSigner}`);
-            core.debug("Verifying Signed APK");
-            const toolcache = await tc.cacheDir(buildTools, con.SIGN_TOOL_APKSIGNER, "0.9");
-            core.addPath(toolcache);
             break;
         }
         case con.SIGN_TOOL_JARSIGNER: {
