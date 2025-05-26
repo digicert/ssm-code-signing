@@ -10,7 +10,7 @@ import { SdkVersionUtils } from "./sdk-version-utils.js";
 
 const utils = new SdkVersionUtils();
 const osPlat: string = os.platform();
-const isWinPlatform = (osPlat == con.OS_PLATFORM_WIN) ? true : false;
+const isWinPlatform = (osPlat === con.OS_PLATFORM_WIN);
 const signtools = isWinPlatform ? con.WIN_OS_TOOL_LIST : con.OTHER_OS_TOOL_LIST;
 const toolInstaller = async (toolName: string, toolPath: string = "") => {
   let cacheDir;

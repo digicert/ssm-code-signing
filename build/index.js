@@ -37313,7 +37313,7 @@ const con = __importStar(__nccwpck_require__(9042));
 const sdk_version_utils_js_1 = __nccwpck_require__(7796);
 const utils = new sdk_version_utils_js_1.SdkVersionUtils();
 const osPlat = os_1.default.platform();
-const isWinPlatform = (osPlat == con.OS_PLATFORM_WIN) ? true : false;
+const isWinPlatform = (osPlat === con.OS_PLATFORM_WIN);
 const signtools = isWinPlatform ? con.WIN_OS_TOOL_LIST : con.OTHER_OS_TOOL_LIST;
 const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
@@ -37451,9 +37451,9 @@ class SdkVersionUtils {
         return numArr;
     }
     getAllSdkVersions(dirPath, sdkVersions = []) {
-        fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(file => {
-            if (this.isVersionDirectory(file.name)) {
-                sdkVersions.push(file.name);
+        fs_1.default.readdirSync(dirPath, { withFileTypes: true }).forEach(({ name }) => {
+            if (this.isVersionDirectory(name)) {
+                sdkVersions.push(name);
             }
         });
         return sdkVersions;

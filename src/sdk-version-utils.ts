@@ -39,9 +39,9 @@ export class SdkVersionUtils {
     }
 
     public getAllSdkVersions(dirPath: any, sdkVersions: any = []): any {
-      fs.readdirSync(dirPath, {withFileTypes: true}).forEach(file => {
-        if(this.isVersionDirectory(file.name)){
-          sdkVersions.push(file.name)
+      fs.readdirSync(dirPath, {withFileTypes: true}).forEach(({ name }) => {
+        if(this.isVersionDirectory(name)){
+            sdkVersions.push(name)
         }
       });
       return sdkVersions;
