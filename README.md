@@ -30,7 +30,7 @@ Software Trust Manager is part of the DigiCert ONE platform, which also includes
 You require a DigiCert ONE account to access Software Trust Manager. If you do not currently have a DigiCert ONE account, you can request a 30-day free trial account from [DigiCert Sales.](https://www.digicert.com/contact-us)
 
 ## Which client tools will be installed and configured?
-- [Signing Manager Controller (SMCTL)](https://docs.digicert.com/en/software-trust-manager/tools/signing-tools/smctl.html)
+- [Signing Manager Controller (SMCTL)](https://docs.digicert.com/en/software-trust-manager/client-tools/command-line-interface/smctl.html)
 SMCTL provides a Command Line Interface (CLI) that facilitates manual or automated private key, certificate management, and signing with or without the need for human intervention.
 
 - [PKCS11 library](https://docs.digicert.com/en/software-trust-manager/tools/cryptographic-libraries-and-frameworks/pkcs11-library.html)
