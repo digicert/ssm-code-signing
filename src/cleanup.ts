@@ -5,4 +5,4 @@ import * as core from "@actions/core";
     const tempPath = core.getState("tempPath");
     console.log(`Cleaning up temporary path:', ${tempPath}`);
     console.log('Cleanup completed. Exiting now.');
-});
+})();

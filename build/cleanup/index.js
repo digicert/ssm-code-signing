@@ -2723,7 +2723,7 @@ const core = __importStar(__nccwpck_require__(186));
     const tempPath = core.getState("tempPath");
     console.log(`Cleaning up temporary path:', ${tempPath}`);
     console.log('Cleanup completed. Exiting now.');
-});
+})();
 
 
 /***/ }),
