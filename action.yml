@@ -4,6 +4,7 @@ description: "Code signing automation with private key protection and multi-fact
 runs:
   using: "node20"
   main: "./build/index.js"
+  post: "./build/cleanup/index.js"
 branding:
   icon: "check-circle"
   color: "blue"
