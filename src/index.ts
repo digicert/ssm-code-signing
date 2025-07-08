@@ -90,7 +90,6 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
 
 (async () => {
   try {
-    const tempPath = core.saveState("tempPath", "/tmp/dcssm/random");
     process.env.SHOULD_CHECK_INSTALLED = "false";
     const result = await main("keypair-signing");
     const message = JSON.parse(result);
