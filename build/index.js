@@ -4072,6 +4072,8 @@ async function main(usecase = "") {
     try {
         // setup the working directory, this includes cleaning up the
         // already existing work directory and recreation of the work directories
+        const staticTempDirPath = (0, fileSystemUtils_1.setupStaticTempDirectory)();
+        tl.setVariable("staticTempDirPath", staticTempDirPath, false, true);
         const tempDirectoryPath = (0, fileSystemUtils_1.setupWorkDirectory)();
         core.saveState("tempDirectoryPath", tempDirectoryPath);
         console.log("using path ", tempDirectoryPath);
@@ -4165,7 +4167,7 @@ async function installLinuxTools(installationPath, toolToBeUsed, usecase, output
     if (usecase != "gpg-signing") {
         const pkcs11FileName = "smpkcs11.so";
         //Configures the pkcs#11
-        configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
+        configFilePath = await (0, services_1.getStaticConfigFilePath)(pkcs11FileName, extractPath);
     }
     return configFilePath;
 }
@@ -4222,6 +4224,23 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
     console.log("path where the ssm tools were installed/extracted is ", extractPath);
     outputVar.imp_file_paths["extractPath"] = extractPath;
     //making the smctl executable file
+    const attachDmg = tl
+        .tool("hdiutil")
+        .arg("attach")
+        .arg(path_1.default.join(extractPath, "smctl.dmg"));
+    const attachRetCode = await attachDmg.exec();
+    if (attachRetCode == 0) {
+        console.log("smctl.dmg attached successfully");
+        const copyExec = tl
+            .tool("cp")
+            .arg("-R")
+            .arg("/Volumes/smctl-mac/smctl-mac-x64")
+            .arg(path_1.default.join(extractPath, "smctl"));
+        const copyExecRetCode = await copyExec.exec();
+        if (copyExecRetCode == 0) {
+            console.log("smctl executable copied successfully");
+        }
+    }
     const setExecutableFlagForSmctl = tl
         .tool("chmod")
         .arg("+x")
@@ -4233,7 +4252,7 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
     if (usecase != "gpg-signing") {
         const pkcs11FileName = "smpkcs11.dmg";
         //pkcs11 library installation
-        configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
+        configFilePath = await (0, services_1.getStaticConfigFilePath)(pkcs11FileName, extractPath);
     }
     return configFilePath;
 }
@@ -4345,7 +4364,7 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
     if (usecase != "gpg-signing") {
         const pkcs11FileName = "smpkcs11.dll";
         //Configures the pkcs#11
-        configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
+        configFilePath = await (0, services_1.getStaticConfigFilePath)(pkcs11FileName, extractPath);
     }
     return configFilePath;
 }
@@ -4576,6 +4595,10 @@ exports.conf = {
     SSM_UNIQUE_DIRECTORY_PREFIX: "dc-ssm-",
     SSM_UNIQUE_DIRECTORY_NAME: "Unique",
     CHMOD_PERMISSIONS: "755",
+    SSM_TOOLS_DIR_NAME: "DigiCert One Signing Manager Tools",
+    WINDOWS_CONFIG_LOCATION: "smtools-windows-x64",
+    LINUX_CONFIG_LOCATION: "smtools-linux-x64",
+    MAC_CONFIG_LOCATION: "smtools-mac-x64",
 };
 module.exports = { conf: exports.conf };
 
@@ -4591,16 +4614,45 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.getTempDirectory = void 0;
+exports.getFileChecksum = exports.doesFileExist = exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.setupStaticTempDirectory = exports.getTempDirectory = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const crypto_1 = __importDefault(__nccwpck_require__(6113));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const constants_js_1 = __nccwpck_require__(9805);
+const OsType_js_1 = __nccwpck_require__(8676);
 const getTempDirectory = () => (process.env.AGENT_WORKFOLDER &&
     path_1.default.join(process.env.AGENT_WORKFOLDER, "_temp")) ||
     os_1.default.tmpdir();
 exports.getTempDirectory = getTempDirectory;
+const setupStaticTempDirectory = () => {
+    const OS = (0, OsType_js_1.getOS)();
+    let configDir = "";
+    if (OS === "win32") {
+        configDir = constants_js_1.conf.WINDOWS_CONFIG_LOCATION;
+    }
+    else if (OS === "darwin") {
+        configDir = constants_js_1.conf.MAC_CONFIG_LOCATION;
+    }
+    else if (OS === "linux") {
+        configDir = constants_js_1.conf.LINUX_CONFIG_LOCATION;
+    }
+    const staticTempDirPath = path_1.default.join((0, exports.getTempDirectory)(), constants_js_1.conf.SSM_TOOLS_DIR_NAME, configDir);
+    try {
+        console.log(`Setting up static temp directory at: ${staticTempDirPath}`);
+        if (fs_1.default.existsSync(staticTempDirPath)) {
+            console.log("Static temp directory already exists.");
+            return staticTempDirPath;
+        }
+        fs_1.default.mkdirSync(staticTempDirPath, { recursive: true });
+        console.log("Static temp directory created successfully.");
+    }
+    catch (err) {
+        console.error("Error setting up static temp directory:", err);
+    }
+    return staticTempDirPath;
+};
+exports.setupStaticTempDirectory = setupStaticTempDirectory;
 const setupWorkDirectory = () => {
     const workDirectory = path_1.default.join((0, exports.getTempDirectory)(), constants_js_1.conf.SSM_WORK_DIRECTORY);
     try {
@@ -4704,12 +4756,42 @@ const cleanupDirectory = (directoryPath, directoryName) => {
     }
 };
 exports.cleanupDirectory = cleanupDirectory;
+const doesFileExist = (filePath) => {
+    try {
+        return fs_1.default.existsSync(filePath);
+    }
+    catch (err) {
+        console.error(`Error checking if file exists at ${filePath}:`, err);
+        return false;
+    }
+};
+exports.doesFileExist = doesFileExist;
+const getFileChecksum = (filePath, algorithm = "sha256") => {
+    return new Promise((resolve, reject) => {
+        const hash = crypto_1.default.createHash(algorithm);
+        const stream = fs_1.default.createReadStream(filePath);
+        stream.on("data", (chunk) => {
+            hash.update(chunk);
+        });
+        stream.on("end", () => {
+            resolve(hash.digest("hex"));
+        });
+        stream.on("error", (err) => {
+            reject(err);
+        });
+    });
+};
+exports.getFileChecksum = getFileChecksum;
 module.exports = {
     getTempDirectory: exports.getTempDirectory,
+    setDirectoryPermissions: exports.setDirectoryPermissions,
+    setupStaticTempDirectory: exports.setupStaticTempDirectory,
     setupWorkDirectory: exports.setupWorkDirectory,
     setupUniqueDirectory: exports.setupUniqueDirectory,
     cleanupDirectory: exports.cleanupDirectory,
     generateDirectory: exports.generateDirectory,
+    doesFileExist: exports.doesFileExist,
+    getFileChecksum: exports.getFileChecksum,
 };
 
 
@@ -4747,11 +4829,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.callApi = exports.toolDownloaded = exports.getConfigFilePath = exports.getAPICall = exports.uiAPIPrefix = void 0;
+exports.callApi = exports.toolDownloaded = exports.getStaticConfigFilePath = exports.getConfigFilePath = exports.getAPICall = exports.uiAPIPrefix = void 0;
 const axios_1 = __importDefault(__nccwpck_require__(8757));
 const tl = __importStar(__nccwpck_require__(8908));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
+const fileSystemUtils_1 = __nccwpck_require__(7755);
 const getHost = () => {
     return "https://demo.one.digicert.com";
 };
@@ -4781,6 +4864,37 @@ const getConfigFilePath = async (pkcs11FileName, extractPath) => {
     return configFilePath;
 };
 exports.getConfigFilePath = getConfigFilePath;
+const getStaticConfigFilePath = async (pkcs11FileName, extractPath) => {
+    let staticTempDirPath = tl.getVariable("staticTempDirPath");
+    if (!staticTempDirPath) {
+        staticTempDirPath = extractPath;
+        throw new Error("Static temp directory path is not set.");
+    }
+    console.log("staticTempDirPath is set to ", staticTempDirPath, "and extractPath is ", extractPath);
+    const configFilePath = path_1.default.join(staticTempDirPath, "pkcs11properties.cfg");
+    console.info("The pkcs11 library path set is ", path_1.default.join(staticTempDirPath, pkcs11FileName), "and config file path is ", configFilePath);
+    if (!(0, fileSystemUtils_1.doesFileExist)(configFilePath)) {
+        fs_1.default.writeFileSync(configFilePath, `name=signingmanager\r\nlibrary=${path_1.default.join(staticTempDirPath, pkcs11FileName)}\r\nslotListIndex=0`);
+    }
+    else {
+        console.log("Config file already exists at the static temp directory path, skipping creation.");
+    }
+    if ((0, fileSystemUtils_1.doesFileExist)(path_1.default.join(staticTempDirPath, pkcs11FileName))) {
+        console.log("PKCS11 library file already exists at the static temp directory path, verifying the hash.");
+        const destFileHash = (0, fileSystemUtils_1.getFileChecksum)(path_1.default.join(staticTempDirPath, pkcs11FileName));
+        const sourceFileHash = (0, fileSystemUtils_1.getFileChecksum)(path_1.default.join(extractPath, pkcs11FileName));
+        if (destFileHash !== sourceFileHash) {
+            console.log("PKCS11 library file hash does not match, overwriting the file.");
+            fs_1.default.copyFileSync(path_1.default.join(extractPath, pkcs11FileName), path_1.default.join(staticTempDirPath, pkcs11FileName));
+        }
+    }
+    else {
+        console.log("PKCS11 library file does not exists, writing the file.");
+        fs_1.default.copyFileSync(path_1.default.join(extractPath, pkcs11FileName), path_1.default.join(staticTempDirPath, pkcs11FileName));
+    }
+    return configFilePath;
+};
+exports.getStaticConfigFilePath = getStaticConfigFilePath;
 exports.toolDownloaded = {
     "ssm-scd-windows-x64": "ssm-scd.exe",
     "smpkcs11-windows-x64": "smpkcs11.dll",
@@ -4793,7 +4907,7 @@ exports.toolDownloaded = {
     "smctl-linux-x64": "smctl",
     "ssm-scd-linux-x64": "ssm-scd",
     "smctk-apple-any": "smtools-mac-x64.zip",
-    "smctl-mac-x64": "smctl",
+    "smctl-mac-x64": "smctl.dmg",
     "smpkcs11-mac-x64": "smpkcs11.dmg",
     "ssm-scd-mac-x64": "ssm-scd.dmg",
 };
@@ -4813,6 +4927,7 @@ exports.callApi = callApi;
 module.exports = {
     getAPICall: exports.getAPICall,
     getConfigFilePath: exports.getConfigFilePath,
+    getStaticConfigFilePath: exports.getStaticConfigFilePath,
     callApi: exports.callApi,
     extractAndValidateApiKey,
     toolDownloaded: exports.toolDownloaded,
