@@ -59,7 +59,8 @@ const utils_1 = __nccwpck_require__(7192);
 async function main(usecase = "") {
     console.log("usecase called for installation is ", usecase);
     const outputVar = { ret_code: 1, imp_file_paths: {} };
-    const forceDownloadTools = process.env.FORCE_DOWNLOAD_TOOLS;
+    const forceDownloadTools = "true";
+    //const forceDownloadTools = process.env.FORCE_DOWNLOAD_TOOLS;
     console.log(`The input value of forceDownloadTools is: ${forceDownloadTools}`);
     tl.setVariable(utils_1.appConst.VAR_FORCE_DOWNLOAD_TOOLS, forceDownloadTools, false, true);
     try {
@@ -394,13 +395,12 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
             tl.setVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS, "true", false, true);
         }
         else {
-            console.log(`Creating installation directory at ${directoryPath}`);
+            console.log(`Creating an installation directory at ${directoryPath}`);
             (0, fileSystemUtils_1.generateDirectory)(directoryPath, "Installation");
         }
     }
     catch (err) {
         console.error(`Error creating installation directory at ${directoryPath}:`, err);
-        throw new Error(`Failed to create installation directory: ${directoryPath}`);
     }
     //function extracts all tools and returns the installed path
     const extractPath = await (0, runWinTools_1.runWinToolBasedInstallationOrExtraction)(toolToBeUsed, directoryPath, usecase);
@@ -776,7 +776,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getFileChecksum = exports.isFileExist = exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.setupStaticTempDirectory = exports.getTempDirectory = void 0;
+exports.getFileChecksum = exports.writeFileWithContent = exports.isFileExist = exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.setupStaticTempDirectory = exports.getTempDirectory = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const crypto_1 = __importDefault(__nccwpck_require__(6113));
@@ -928,7 +928,20 @@ const isFileExist = (filePath) => {
     }
 };
 exports.isFileExist = isFileExist;
+const writeFileWithContent = (filePath, fileContent) => {
+    try {
+        console.log(`Got a request to write a hash for a file : ${filePath}`);
+        fs_1.default.appendFileSync(filePath, fileContent);
+        console.log(`File hash has been written successfully.`);
+        return true;
+    }
+    catch (err) {
+        console.error(`File writing failed! with error : `, err);
+    }
+};
+exports.writeFileWithContent = writeFileWithContent;
 const getFileChecksum = (filePath, algorithm = "sha256") => {
+    console.log(`Calculating checksum for ${filePath}`);
     return new Promise((resolve, reject) => {
         const hash = crypto_1.default.createHash(algorithm);
         const stream = fs_1.default.createReadStream(filePath);
@@ -937,9 +950,11 @@ const getFileChecksum = (filePath, algorithm = "sha256") => {
         });
         stream.on("end", () => {
             resolve(hash.digest("hex"));
+            stream._destroy;
         });
         stream.on("error", (err) => {
             reject(err);
+            stream._destroy;
         });
     });
 };
@@ -954,7 +969,11 @@ module.exports = {
     generateDirectory: exports.generateDirectory,
     isFileExist: exports.isFileExist,
     getFileChecksum: exports.getFileChecksum,
+    writeFileWithContent: exports.writeFileWithContent,
 };
+(0, exports.getFileChecksum)("/var/folders/wz/3w83bsv91rg_bpdyv6xtk1j00000gp/T/DigiCert One Signing Manager Tools/smtools-mac-x64.zip", "sha256").then((data) => {
+    console.log("Checksum = ", data);
+});
 
 
 /***/ }),
@@ -1137,6 +1156,8 @@ const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
     const isFileWritten = await (0, exports.readFileApiCall)(urlToDownloadTool, clientToolsDownloadPath);
     if (isFileWritten) {
         console.log("file after write ", fs_1.default.statSync(clientToolsDownloadPath).size);
+        const fileHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+        (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(getTempDirectoryPath, ".tool-hash"), `${utils_1.toolDownloaded[toolToBeUsed]}=${fileHash}\r\n`);
     }
     else {
         console.error("file write failed");
