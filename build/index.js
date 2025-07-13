@@ -436,14 +436,12 @@ async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 }
             }
         }
-        // Release lock from the tempDirectory
-        await lockfile.unlock(tempDirectoryPath);
-        console.log(`Lock released for ${tempDirectoryPath}.`);
     }
     catch (error) {
         console.error(`Error processing file ${tempDirectoryPath}:`, error);
     }
     finally {
+        // Release lock from the tempDirectory
         await lockfile.unlock(tempDirectoryPath);
         console.log(`Lock released for ${tempDirectoryPath}.`);
     }
@@ -575,7 +573,7 @@ async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 //initiates an API call and writes files to a specified temporary location.
                 clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
                 try {
-                    processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
+                    await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
                 }
                 catch (error) {
                     if (typeof error === "object" &&
@@ -593,14 +591,12 @@ async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 }
             }
         }
-        // Release lock from the tempDirectory
-        await lockfile.unlock(tempDirectoryPath);
-        console.log(`Lock released for ${tempDirectoryPath}.`);
     }
     catch (error) {
         console.error(`Error processing file ${tempDirectoryPath}:`, error);
     }
     finally {
+        // Release lock from the tempDirectory
         await lockfile.unlock(tempDirectoryPath);
         console.log(`Lock released for ${tempDirectoryPath}.`);
     }
