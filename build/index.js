@@ -858,6 +858,37 @@ module.exports = { runWinToolBasedInstallationOrExtraction, getAPICall: services
 
 /***/ }),
 
+/***/ 9164:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.CustomChunkReadable = void 0;
+const stream_1 = __nccwpck_require__(2781);
+class CustomChunkReadable extends stream_1.Readable {
+    constructor(dataBuffer, chunkSize, options) {
+        super(options);
+        this.dataBuffer = dataBuffer;
+        this.chunkSize = chunkSize;
+        this.offset = 0;
+    }
+    _read(_size) {
+        if (this.offset >= this.dataBuffer.length) {
+            this.push(null); // Signal end of stream
+            return;
+        }
+        const end = Math.min(this.offset + this.chunkSize, this.dataBuffer.length);
+        const chunk = this.dataBuffer.slice(this.offset, end);
+        this.push(chunk);
+        this.offset = end;
+    }
+}
+exports.CustomChunkReadable = CustomChunkReadable;
+
+
+/***/ }),
+
 /***/ 2042:
 /***/ (function(module, exports, __nccwpck_require__) {
 
@@ -1160,10 +1191,36 @@ const path_1 = __importDefault(__nccwpck_require__(1017));
 const fs_1 = __importDefault(__nccwpck_require__(7147));
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 const utils_1 = __nccwpck_require__(7192);
+const CustomChunkReadable_1 = __nccwpck_require__(9164);
 const getHost = () => {
     return "https://demo.one.digicert.com";
 };
 exports.uiAPIPrefix = "signingmanager/api-ui/v1";
+//Usage: processFileResponse(Buffer.from(response.data), 128 * 1024, fileStream);
+async function processFileResponse(responseBuffer, customChunkSize, fileWriteStream) {
+    const readableStream = new CustomChunkReadable_1.CustomChunkReadable(responseBuffer, customChunkSize);
+    readableStream.on("data", async (chunk) => {
+        console.log(`Received chunk of size: ${chunk.length} bytes`);
+        chunk.pipe(fileWriteStream);
+        await new Promise((resolve, reject) => {
+            fileWriteStream.on("finish", () => {
+                console.log("File successfully downloaded and saved locally.");
+                resolve();
+            });
+            fileWriteStream.on("error", (err) => {
+                console.error("Error writing file:", err);
+                reject(err);
+            });
+        });
+        // Process the chunk here (e.g., write to another stream, save to disk)
+    });
+    readableStream.on("end", () => {
+        console.log("File stream ended.");
+    });
+    readableStream.on("error", (err) => {
+        console.error("Stream error:", err);
+    });
+}
 const readFileApiCall = async (uri, localFilePath) => {
     const apiKey = extractAndValidateApiKey();
     const options = {
@@ -1290,6 +1347,7 @@ const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
     console.log(`Tool to be downloaded and used ${toolToBeUsed} and url is ${urlToDownloadTool}`);
     // Form a complete download path
     const clientToolsDownloadPath = path_1.default.join(getTempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]);
+    console.log(`Tool download file path ${clientToolsDownloadPath}`);
     // Read file from the API and write into a local file
     const isFileWritten = await (0, exports.readFileApiCall)(urlToDownloadTool, clientToolsDownloadPath);
     //Once file is written, compute the hash for the downloaded file
