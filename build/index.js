@@ -860,11 +860,13 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
 async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed, usecase) {
     let extractPath = "";
     if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
+        console.log("Force installation has been requested");
         try {
             if (!(0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed))) {
                 if (usecase == "" || usecase == "keypair-signing") {
                     //checking for .msi files
                     if (toolToBeUsed.includes(".msi")) {
+                        console.log(`Force installing the tool : ${toolToBeUsed}`);
                         extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
                         //tool to run .msi file
                         const msiRunner = tl
@@ -898,6 +900,8 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                         const { stdout } = installationLocation;
                         extractPath = stdout.split("=")[1].trim();
                     }
+                    const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+                    (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
                 }
             }
         }
