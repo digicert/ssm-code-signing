@@ -834,8 +834,8 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed))) {
-            console.log("The msi installer already exists at : ", path_1.default.join(tempDirectoryPath, toolToBeUsed));
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
+            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
                 console.log(`Skipping download for ${toolToBeUsed} as it already exists.`);
@@ -845,6 +845,10 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
                 console.log(`Forcing download for ${toolToBeUsed} even though it exists.`);
                 downloadFlag = true;
             }
+        }
+        else {
+            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
+            downloadFlag = true;
         }
     }
     else {
