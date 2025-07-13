@@ -489,6 +489,13 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 const unzipRetCode = await unzipSmctl.exec();
                 if (unzipRetCode == 0) {
                     console.log("zip extracted successfully for ", toolToBeUsed);
+                    //making the smctl executable file
+                    const setExecutableFlagForSmctl = tl
+                        .tool("chmod")
+                        .arg("+x")
+                        .arg(path_1.default.join(clientToolsDownloadPath.replace(".zip", ""), "smctl"));
+                    const syncRetCode = await setExecutableFlagForSmctl.exec();
+                    console.log("set executable flag for smctl ", syncRetCode);
                 }
                 else {
                     console.error("zip extraction failed for ", toolToBeUsed);
@@ -1251,6 +1258,7 @@ const readFileApiCall = async (uri, localFilePath) => {
             });
             fileStream.on("error", (err) => {
                 console.error("Error writing file:", err);
+                fs_1.default.unlinkSync(localFilePath);
                 reject(err);
             });
         });
@@ -1277,7 +1285,8 @@ const readFileApiCall = async (uri, localFilePath) => {
         result = false;
     }
     finally {
-        fileStream._destroy;
+        fileStream.close();
+        //fileStream._destroy;
     }
     return result;
 };
