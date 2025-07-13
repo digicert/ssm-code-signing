@@ -149,7 +149,7 @@ async function installLinuxTools(installationPath, toolToBeUsed, usecase, output
     outputVar.imp_file_paths["extractPath"] = extractPath;
     let configFilePath = "";
     //pkcs11 library installation
-    if (usecase != "gpg-signing") {
+    if (usecase != "gpg-signing" && extractPath !== "") {
         const pkcs11FileName = "smpkcs11.so";
         //Configures the pkcs#11
         configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
@@ -418,7 +418,7 @@ async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 //initiates an API call and writes files to a specified temporary location.
                 clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
                 try {
-                    processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
+                    await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
                 }
                 catch (error) {
                     if (typeof error === "object" &&
