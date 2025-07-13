@@ -119,12 +119,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.installLinuxTools = void 0;
-const path_1 = __importDefault(__nccwpck_require__(1017));
 const tl = __importStar(__nccwpck_require__(1092));
 const services_1 = __nccwpck_require__(1174);
 const runLinuxTools_1 = __nccwpck_require__(3099);
@@ -134,7 +130,7 @@ async function installLinuxTools(installationPath, toolToBeUsed, usecase, output
     const directoryPath = `${installationPath}//DigiCert One Signing Manager Tools/`;
     //Check if the directory already exists, if not create it
     try {
-        if ((0, fileSystemUtils_1.isFileExist)(directoryPath)) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(directoryPath)) {
             console.log(`The installation directory already exists at : ${directoryPath}`);
             // If the directory exists, set this IS_INSTALLATION_DIR_EXISTS variable to true
             // this can be used to skip the installation step in subsequent runs
@@ -151,13 +147,6 @@ async function installLinuxTools(installationPath, toolToBeUsed, usecase, output
     const extractPath = await (0, runLinuxTools_1.runLnxToolBasedInstallationOrExtraction)(toolToBeUsed, directoryPath, usecase);
     console.log("path where the stm tools were installed/extracted is ", extractPath);
     outputVar.imp_file_paths["extractPath"] = extractPath;
-    //making the smctl executable file
-    const setExecutableFlagForSmctl = tl
-        .tool("chmod")
-        .arg("+x")
-        .arg(path_1.default.join(extractPath, "smctl"));
-    const syncRetCode = await setExecutableFlagForSmctl.exec();
-    console.log("set executable flag for smctl ", syncRetCode);
     let configFilePath = "";
     //pkcs11 library installation
     if (usecase != "gpg-signing") {
@@ -200,12 +189,8 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.installMacTools = void 0;
-const path_1 = __importDefault(__nccwpck_require__(1017));
 const tl = __importStar(__nccwpck_require__(1092));
 const services_1 = __nccwpck_require__(1174);
 const runMacTools_1 = __nccwpck_require__(212);
@@ -215,7 +200,7 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
     const directoryPath = `${installationPath}//DigiCert One Signing Manager Tools/`;
     try {
         //Check if the directory already exists, if not create it
-        if ((0, fileSystemUtils_1.isFileExist)(directoryPath)) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(directoryPath)) {
             console.log(`The installation directory already exists at : ${directoryPath}`);
             // If the directory exists, set this IS_INSTALLATION_DIR_EXISTS variable to true
             // this can be used to skip the installation step in subsequent runs
@@ -232,52 +217,6 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
     const extractPath = await (0, runMacTools_1.runMacToolBasedInstallationOrExtraction)(toolToBeUsed, directoryPath, usecase);
     console.log("path where the ssm tools were installed/extracted is ", extractPath);
     outputVar.imp_file_paths["extractPath"] = extractPath;
-    //making the smctl executable file
-    // Unique mount point name to avoid conflicts
-    const uniqueVolumeName = utils_1.appConst.MOUNT_VOL_NAME + "-" + Math.random().toString(36).substring(2, 15);
-    const attachDmg = tl
-        .tool("hdiutil")
-        .arg("attach")
-        .arg(path_1.default.join(extractPath, "smctl.dmg"))
-        .arg("-mountpoint")
-        .arg(uniqueVolumeName);
-    const attachRetCode = await attachDmg.exec();
-    if (attachRetCode == 0) {
-        console.log("smctl.dmg attached successfully");
-        const copyExec = tl
-            .tool("cp")
-            .arg("-R")
-            .arg(path_1.default.join(uniqueVolumeName, utils_1.appConst.MOUNTED_VOL_PATH))
-            .arg(path_1.default.join(extractPath, "smctl"));
-        const copyExecRetCode = await copyExec.exec();
-        if (copyExecRetCode == 0) {
-            console.log("smctl executable copied successfully");
-            console.log("detaching the dmg file");
-            const detachDmg = tl
-                .tool("hdiutil")
-                .arg("detach")
-                .arg(uniqueVolumeName);
-            const detachRetCode = await detachDmg.exec();
-            if (detachRetCode == 0) {
-                console.log("smctl.dmg detached successfully", detachRetCode);
-            }
-            else {
-                console.error("Failed to detach smctl.dmg", detachRetCode);
-            }
-        }
-        else {
-            console.error("Failed to copy smctl executable", copyExecRetCode);
-        }
-    }
-    else {
-        console.error("Failed to attach smctl.dmg", attachRetCode);
-    }
-    const setExecutableFlagForSmctl = tl
-        .tool("chmod")
-        .arg("+x")
-        .arg(path_1.default.join(extractPath, "smctl"));
-    const syncRetCode = await setExecutableFlagForSmctl.exec();
-    console.log("set executable flag for smctl ", syncRetCode);
     let configFilePath = "";
     //pkcs11 library installation
     if (usecase != "gpg-signing") {
@@ -388,7 +327,7 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
         : `${installationPath}`;
     try {
         //Check if the directory already exists, if not create it
-        if ((0, fileSystemUtils_1.isFileExist)(directoryPath)) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(directoryPath)) {
             console.log(`The installation directory already exists at : ${directoryPath}`);
             // If the directory exists, set this IS_INSTALLATION_DIR_EXISTS variable to true
             // this can be used to skip the installation step in subsequent runs
@@ -461,45 +400,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runLnxToolBasedInstallationOrExtraction = void 0;
 const tl = __importStar(__nccwpck_require__(1092));
+const lockfile = __importStar(__nccwpck_require__(2147));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const services_1 = __nccwpck_require__(1174);
 const utils_1 = __nccwpck_require__(7192);
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirectoryPath, usecase) {
-    let extractPath = tempDirectoryPath;
-    for (let i = 0; i < toolToBeUsed.length; i++) {
-        const downloadFlag = checkToolsTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
-        let clientToolsDownloadPath = "";
-        if (downloadFlag) {
-            //initiates an API call and writes files to a specified temporary location.
-            clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
-            if (usecase == "" || usecase == "keypair-signing") {
-                //cheks for .zip file
-                if (toolToBeUsed[i].includes(".zip")) {
-                    console.log("tool is in a zip file trying to extract it", clientToolsDownloadPath);
-                    //extracts zip
-                    /*await toolLib.extractZip(
-                      clientToolsDownloadPath as string,
-                      tempDirectoryPath
-                    );*/
-                    const unzipSmctl = tl
-                        .tool("unzip")
-                        .arg("-o")
-                        .arg(clientToolsDownloadPath)
-                        .arg("-d")
-                        .arg(tempDirectoryPath);
-                    const unzipRetCode = await unzipSmctl.exec();
-                    if (unzipRetCode == 0) {
-                        console.log("zip extracted successfully for ", toolToBeUsed[i]);
+    const extractPath = tempDirectoryPath;
+    try {
+        // Acquire a lock on the tempDirectory
+        await lockfile.lock(tempDirectoryPath, { stale: 5000 });
+        console.log(`Lock acquired for ${tempDirectoryPath}.`);
+        for (let i = 0; i < toolToBeUsed.length; i++) {
+            const downloadFlag = checkToolsTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
+            let clientToolsDownloadPath = "";
+            if (downloadFlag) {
+                //initiates an API call and writes files to a specified temporary location.
+                clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
+                try {
+                    processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
+                }
+                catch (error) {
+                    if (typeof error === "object" &&
+                        error !== null &&
+                        "code" in error &&
+                        error.code === "ELOCKED") {
+                        console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                        // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
+                        await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
                     }
                     else {
-                        console.error("zip extraction failed for ", toolToBeUsed[i]);
+                        console.error(`Error processing file ${tempDirectoryPath}:`, error);
                     }
-                    extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed[i].replace(".zip", ""));
-                    console.log("zip extraction complete , path is ", extractPath);
                 }
             }
         }
+        // Release lock from the tempDirectory
+        await lockfile.unlock(tempDirectoryPath);
+        console.log(`Lock released for ${tempDirectoryPath}.`);
+    }
+    catch (error) {
+        console.error(`Error processing file ${tempDirectoryPath}:`, error);
+    }
+    finally {
+        await lockfile.unlock(tempDirectoryPath);
+        console.log(`Lock released for ${tempDirectoryPath}.`);
     }
     return extractPath;
 }
@@ -511,7 +457,7 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExist)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
             console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
@@ -530,6 +476,48 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     }
     return downloadFlag;
 };
+async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
+    if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
+        try {
+            if (utils_1.toolDownloaded[toolToBeUsed].includes(".zip")) {
+                console.log("The tool is in a zip file trying to extract it : ", clientToolsDownloadPath);
+                //extracts tool.zip
+                const unzipSmctl = tl
+                    .tool("unzip")
+                    .arg("-o")
+                    .arg(clientToolsDownloadPath)
+                    .arg("-d")
+                    .arg(tempDirectoryPath);
+                const unzipRetCode = await unzipSmctl.exec();
+                if (unzipRetCode == 0) {
+                    console.log("zip extracted successfully for ", toolToBeUsed);
+                }
+                else {
+                    console.error("zip extraction failed for ", toolToBeUsed);
+                }
+                const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
+                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
+                console.log("zip extraction completed, path is ", clientToolsDownloadPath);
+            }
+        }
+        catch (error) {
+            if (typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "ELOCKED") {
+                console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+                // Retry the operation
+                await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
+            }
+            else {
+                console.error(`Error processing file ${tempDirectoryPath}:`, error);
+            }
+        }
+    }
+}
 module.exports = { runLnxToolBasedInstallationOrExtraction };
 
 
@@ -569,44 +557,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.runMacToolBasedInstallationOrExtraction = void 0;
 const tl = __importStar(__nccwpck_require__(1092));
+const lockfile = __importStar(__nccwpck_require__(2147));
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const services_1 = __nccwpck_require__(1174);
 const utils_1 = __nccwpck_require__(7192);
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirectoryPath, usecase) {
     const extractPath = tempDirectoryPath;
-    for (let i = 0; i < toolToBeUsed.length; i++) {
-        const downloadFlag = checkToolsTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
-        let clientToolsDownloadPath = "";
-        if (downloadFlag) {
-            //initiates an API call and writes files to a specified temporary location.
-            clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
-            if (utils_1.toolDownloaded[toolToBeUsed[i]].includes(".zip")) {
-                console.log("tool is in a zip file trying to extract it", clientToolsDownloadPath);
-                //extracts zip
-                /*
-                await toolLib.extractZip(
-                  clientToolsDownloadPath as string,
-                  tempDirectoryPath
-                );
-                */
-                const unzipSmctl = tl
-                    .tool("unzip")
-                    .arg("-o")
-                    .arg(clientToolsDownloadPath)
-                    .arg("-d")
-                    .arg(tempDirectoryPath);
-                const unzipRetCode = await unzipSmctl.exec();
-                if (unzipRetCode == 0) {
-                    console.log("zip extracted successfully for ", toolToBeUsed[i]);
+    try {
+        // Acquire a lock on the tempDirectory
+        await lockfile.lock(tempDirectoryPath, { stale: 5000 });
+        console.log(`Lock acquired for ${tempDirectoryPath}.`);
+        for (let i = 0; i < toolToBeUsed.length; i++) {
+            const downloadFlag = checkToolsTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
+            let clientToolsDownloadPath = "";
+            if (downloadFlag) {
+                //initiates an API call and writes files to a specified temporary location.
+                clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
+                try {
+                    processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
                 }
-                else {
-                    console.error("zip extraction failed for ", toolToBeUsed[i]);
+                catch (error) {
+                    if (typeof error === "object" &&
+                        error !== null &&
+                        "code" in error &&
+                        error.code === "ELOCKED") {
+                        console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                        // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
+                        await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
+                    }
+                    else {
+                        console.error(`Error processing file ${tempDirectoryPath}:`, error);
+                    }
                 }
-                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed[i]].replace(".zip", ""));
-                console.log("zip extraction completed, path is ", clientToolsDownloadPath);
             }
         }
+        // Release lock from the tempDirectory
+        await lockfile.unlock(tempDirectoryPath);
+        console.log(`Lock released for ${tempDirectoryPath}.`);
+    }
+    catch (error) {
+        console.error(`Error processing file ${tempDirectoryPath}:`, error);
+    }
+    finally {
+        await lockfile.unlock(tempDirectoryPath);
+        console.log(`Lock released for ${tempDirectoryPath}.`);
     }
     return extractPath;
 }
@@ -618,7 +614,7 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExist)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
             console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
@@ -630,6 +626,10 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
                 downloadFlag = true;
             }
         }
+        else {
+            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
+            downloadFlag = true;
+        }
     }
     else {
         console.log("Fresh installation directory was created hence downloading the installer");
@@ -637,6 +637,101 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     }
     return downloadFlag;
 };
+async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
+    if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
+        try {
+            if (utils_1.toolDownloaded[toolToBeUsed].includes(".zip")) {
+                console.log("The tool is in a zip file trying to extract it : ", clientToolsDownloadPath);
+                //extracts tool.zip
+                const unzipSmctl = tl
+                    .tool("unzip")
+                    .arg("-o")
+                    .arg(clientToolsDownloadPath)
+                    .arg("-d")
+                    .arg(tempDirectoryPath);
+                const unzipRetCode = await unzipSmctl.exec();
+                if (unzipRetCode == 0) {
+                    console.log("zip extracted successfully for ", toolToBeUsed);
+                }
+                else {
+                    console.error("zip extraction failed for ", toolToBeUsed);
+                }
+                const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
+                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
+                console.log("zip extraction completed, path is ", clientToolsDownloadPath);
+            }
+            else if (utils_1.toolDownloaded[toolToBeUsed].includes(".dmg")) {
+                // making the smctl executable file
+                // Unique mount point name to avoid conflicts
+                const toolExec = utils_1.appConst.TOOL_EXECUTABLES[utils_1.toolDownloaded[toolToBeUsed]];
+                const uniqueVolumeName = utils_1.appConst.MOUNT_VOL_NAMES[utils_1.toolDownloaded[toolToBeUsed]] +
+                    "-" +
+                    Math.random().toString(36).substring(2, 15);
+                const attachDmg = tl
+                    .tool("hdiutil")
+                    .arg("attach")
+                    .arg(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))
+                    .arg("-mountpoint")
+                    .arg(uniqueVolumeName);
+                const attachRetCode = await attachDmg.exec();
+                if (attachRetCode == 0) {
+                    console.log(`${utils_1.toolDownloaded[toolToBeUsed]} attached successfully`);
+                    const copyExec = tl
+                        .tool("cp")
+                        .arg("-R")
+                        .arg(path_1.default.join(uniqueVolumeName, utils_1.appConst.MOUNT_VOL_PATHS[utils_1.toolDownloaded[toolToBeUsed]]))
+                        .arg(path_1.default.join(tempDirectoryPath, toolExec));
+                    const copyExecRetCode = await copyExec.exec();
+                    if (copyExecRetCode == 0) {
+                        console.log(`${utils_1.toolDownloaded[toolToBeUsed]} executable copied successfully`);
+                        console.log("Detaching the dmg file");
+                        const detachDmg = tl
+                            .tool("hdiutil")
+                            .arg("detach")
+                            .arg(uniqueVolumeName);
+                        const detachRetCode = await detachDmg.exec();
+                        if (detachRetCode == 0) {
+                            console.log(`${utils_1.toolDownloaded[toolToBeUsed]} detached successfully ${detachRetCode}`);
+                        }
+                        else {
+                            console.error(`Failed to detach ${utils_1.toolDownloaded[toolToBeUsed]} : ${detachRetCode}`);
+                        }
+                        const setExecutableFlagForTool = tl
+                            .tool("chmod")
+                            .arg("+x")
+                            .arg(path_1.default.join(tempDirectoryPath, toolExec));
+                        const syncRetCode = await setExecutableFlagForTool.exec();
+                        console.log(`Set executable flag for ${toolExec} : ${syncRetCode}`);
+                        const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+                        (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
+                    }
+                    else {
+                        console.error(`Failed to copy ${toolExec} executable ${copyExecRetCode}`);
+                    }
+                }
+                else {
+                    console.error(`Failed to attach ${utils_1.toolDownloaded[toolToBeUsed]}: ${attachRetCode}`);
+                }
+            }
+        }
+        catch (error) {
+            if (typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "ELOCKED") {
+                console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+                // Retry the operation
+                await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
+            }
+            else {
+                console.error(`Error processing file ${tempDirectoryPath}:`, error);
+            }
+        }
+    }
+}
 module.exports = { runMacToolBasedInstallationOrExtraction };
 
 
@@ -688,7 +783,7 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
             //initiates an API call and writes files to a specified temporary location
             await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
         }
-        if (!(0, fileSystemUtils_1.isFileExist)(path_1.default.join(tempDirectoryPath, toolToBeUsed[i]))) {
+        if (!(0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed[i]))) {
             if (usecase == "" || usecase == "keypair-signing") {
                 //checking for .msi files
                 if (toolToBeUsed[i].includes(".msi")) {
@@ -743,7 +838,7 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExist)(path_1.default.join(tempDirectoryPath, toolToBeUsed))) {
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed))) {
             console.log("The msi installer already exists at : ", path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
@@ -776,7 +871,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getFileChecksum = exports.writeFileWithContent = exports.isFileExist = exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.setupStaticTempDirectory = exports.getTempDirectory = void 0;
+exports.getFileChecksum = exports.parseHashFile = exports.isFileNotEmptySync = exports.readFileSync = exports.writeFileWithContent = exports.isFileExistSync = exports.cleanupDirectory = exports.generateDirectory = exports.setDirectoryPermissions = exports.setupUniqueDirectory = exports.setupWorkDirectory = exports.setupStaticTempDirectory = exports.getTempDirectory = void 0;
 const path_1 = __importDefault(__nccwpck_require__(1017));
 const os_1 = __importDefault(__nccwpck_require__(2037));
 const crypto_1 = __importDefault(__nccwpck_require__(6113));
@@ -918,7 +1013,7 @@ const cleanupDirectory = (directoryPath, directoryName) => {
     }
 };
 exports.cleanupDirectory = cleanupDirectory;
-const isFileExist = (filePath) => {
+const isFileExistSync = (filePath) => {
     try {
         return fs_1.default.existsSync(filePath);
     }
@@ -927,10 +1022,10 @@ const isFileExist = (filePath) => {
         return false;
     }
 };
-exports.isFileExist = isFileExist;
-const writeFileWithContent = (filePath, fileContent) => {
+exports.isFileExistSync = isFileExistSync;
+const writeFileWithContent = (filePath, fileName, fileContent) => {
     try {
-        console.log(`Got a request to write a hash for a file : ${filePath}`);
+        console.log(`Writing a hash for a file into : ${filePath}`);
         fs_1.default.appendFileSync(filePath, fileContent);
         console.log(`File hash has been written successfully.`);
         return true;
@@ -940,6 +1035,58 @@ const writeFileWithContent = (filePath, fileContent) => {
     }
 };
 exports.writeFileWithContent = writeFileWithContent;
+const readFileSync = (filePath, fileName) => {
+    try {
+        console.log(`Reading a hash from a file : ${fileName}`);
+        const content = fs_1.default.readFileSync(filePath);
+        return content;
+    }
+    catch (err) {
+        console.error(`File reading failed! with error : `, err);
+        return "";
+    }
+};
+exports.readFileSync = readFileSync;
+const isFileNotEmptySync = (filePath) => {
+    try {
+        const stats = fs_1.default.statSync(filePath);
+        return stats.size > 0; // Returns true if size is greater than 0
+    }
+    catch (error) {
+        // Handle cases where the file doesn't exist or other errors
+        if (typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            error.code === "ENOENT") {
+            console.log(`File not found: ${filePath}`);
+            return false; // File doesn't exist, so it's not "not empty"
+        }
+        else {
+            console.error(`Error checking file: ${error.message}`);
+            return false;
+        }
+    }
+};
+exports.isFileNotEmptySync = isFileNotEmptySync;
+const parseHashFile = (content) => {
+    const lines = content.split("\n");
+    const keyValueObject = {};
+    lines.forEach((line) => {
+        const trimmedLine = line.trim();
+        if (trimmedLine) {
+            // Ensure line is not empty
+            const parts = trimmedLine.split("=");
+            if (parts.length >= 2) {
+                const key = parts[0].trim();
+                const value = parts.slice(1).join("=").trim(); // Handle values with '='
+                keyValueObject[key] = value;
+            }
+        }
+    });
+    console.debug(`Parsed hash file = ${keyValueObject}`);
+    return keyValueObject;
+};
+exports.parseHashFile = parseHashFile;
 const getFileChecksum = (filePath, algorithm = "sha256") => {
     console.log(`Calculating checksum for ${filePath}`);
     return new Promise((resolve, reject) => {
@@ -967,13 +1114,13 @@ module.exports = {
     setupUniqueDirectory: exports.setupUniqueDirectory,
     cleanupDirectory: exports.cleanupDirectory,
     generateDirectory: exports.generateDirectory,
-    isFileExist: exports.isFileExist,
+    isFileExistSync: exports.isFileExistSync,
     getFileChecksum: exports.getFileChecksum,
     writeFileWithContent: exports.writeFileWithContent,
+    isFileNotEmptySync: exports.isFileNotEmptySync,
+    readFileSync: exports.readFileSync,
+    parseHashFile: exports.parseHashFile,
 };
-(0, exports.getFileChecksum)("/var/folders/wz/3w83bsv91rg_bpdyv6xtk1j00000gp/T/DigiCert One Signing Manager Tools/smtools-mac-x64.zip", "sha256").then((data) => {
-    console.log("Checksum = ", data);
-});
 
 
 /***/ }),
@@ -1034,6 +1181,7 @@ const readFileApiCall = async (uri, localFilePath) => {
     const host = getHost();
     let response = {};
     let result = false;
+    const fileStream = fs_1.default.createWriteStream(localFilePath);
     try {
         response = await axios_1.default.get(`${host}/${uri}`, options);
         if (response.status !== 200) {
@@ -1042,7 +1190,6 @@ const readFileApiCall = async (uri, localFilePath) => {
         }
         console.log("File fetched successfully from the API.");
         // Write the file synchronously to avoid partial writes
-        const fileStream = fs_1.default.createWriteStream(localFilePath);
         response.data.pipe(fileStream);
         await new Promise((resolve, reject) => {
             fileStream.on("finish", () => {
@@ -1077,6 +1224,7 @@ const readFileApiCall = async (uri, localFilePath) => {
         result = false;
     }
     finally {
+        fileStream._destroy;
     }
     return result;
 };
@@ -1115,13 +1263,13 @@ const getStaticConfigFilePath = async (pkcs11FileName, extractPath) => {
     console.log("staticTempDirPath is set to ", staticTempDirPath, "and extractPath is ", extractPath);
     const configFilePath = path_1.default.join(staticTempDirPath, "pkcs11properties.cfg");
     console.info("The pkcs11 library path set is ", path_1.default.join(staticTempDirPath, pkcs11FileName), "and config file path is ", configFilePath);
-    if (!(0, fileSystemUtils_1.isFileExist)(configFilePath)) {
+    if (!(0, fileSystemUtils_1.isFileExistSync)(configFilePath)) {
         fs_1.default.writeFileSync(configFilePath, `name=signingmanager\r\nlibrary=${path_1.default.join(staticTempDirPath, pkcs11FileName)}\r\nslotListIndex=0`);
     }
     else {
         console.log("Config file already exists at the static temp directory path, skipping creation.");
     }
-    if ((0, fileSystemUtils_1.isFileExist)(path_1.default.join(staticTempDirPath, pkcs11FileName))) {
+    if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(staticTempDirPath, pkcs11FileName))) {
         console.log("PKCS11 library file already exists at the static temp directory path, verifying the hash.");
         const destFileHash = (0, fileSystemUtils_1.getFileChecksum)(path_1.default.join(staticTempDirPath, pkcs11FileName));
         const sourceFileHash = (0, fileSystemUtils_1.getFileChecksum)(path_1.default.join(extractPath, pkcs11FileName));
@@ -1144,23 +1292,46 @@ exports.getStaticConfigFilePath = getStaticConfigFilePath;
 const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
     const urlToDownloadTool = `${exports.uiAPIPrefix}/releases/noauth/${toolToBeUsed}/download`;
     console.log(`Tool to be downloaded and used ${toolToBeUsed} and url is ${urlToDownloadTool}`);
-    /*
-    const toolFileData = await getAPICall(urlToDownloadTool, {
-      responseType: "arraybuffer",
-    });
-  
-    fs.writeFileSync(clientToolsDownloadPath, toolFileData);
-    */
-    //file writing part
+    // Form a complete download path
     const clientToolsDownloadPath = path_1.default.join(getTempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]);
+    // Read file from the API and write into a local file
     const isFileWritten = await (0, exports.readFileApiCall)(urlToDownloadTool, clientToolsDownloadPath);
+    //Once file is written, compute the hash for the downloaded file
+    //and store it into a hash file for future reference
     if (isFileWritten) {
-        console.log("file after write ", fs_1.default.statSync(clientToolsDownloadPath).size);
-        const fileHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
-        (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(getTempDirectoryPath, ".tool-hash"), `${utils_1.toolDownloaded[toolToBeUsed]}=${fileHash}\r\n`);
+        console.log("File after write ", fs_1.default.statSync(clientToolsDownloadPath).size);
+        const hashFilePath = path_1.default.join(getTempDirectoryPath, utils_1.appConst.HASH_FILE_NAME);
+        // Check if the hash file already exists, and it's not empty
+        // if so, then read the hash from it and compare it with the freshly downloaded file hash
+        let forceInstallTool = "false";
+        if ((0, fileSystemUtils_1.isFileExistSync)(hashFilePath) && (0, fileSystemUtils_1.isFileNotEmptySync)(hashFilePath)) {
+            const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
+            const toolHashMap = (0, fileSystemUtils_1.parseHashFile)((0, fileSystemUtils_1.readFileSync)(hashFilePath, utils_1.appConst.HASH_FILE_NAME).toString());
+            console.log(`${toolToBeUsed} Hash = `, toolHashMap[utils_1.toolDownloaded[toolToBeUsed]]);
+            console.log(`Downloaded file Hash = `, downloadToolHash);
+            if (toolHashMap[utils_1.toolDownloaded[toolToBeUsed]] === downloadToolHash) {
+                console.log(`The installed tool's hash matches with the downloaded file's hash,\n`, `Skipping the tool installation / extraction`);
+                forceInstallTool = "false";
+                tl.setVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL, forceInstallTool, false, true);
+            }
+            else {
+                console.log(`The installed tools hash doesn't match with the downloaded file's hash,\n`, `Continuing with the tool installation / extraction`);
+                /*writeFileWithContent(
+                  path.join(getTempDirectoryPath, appConst.HASH_FILE_NAME),
+                  toolDownloaded[toolToBeUsed],
+                  `${toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`
+                );*/
+                forceInstallTool = "true";
+                tl.setVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL, forceInstallTool, false, true);
+            }
+        }
+        else {
+            forceInstallTool = "true";
+            tl.setVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL, forceInstallTool, false, true);
+        }
     }
     else {
-        console.error("file write failed");
+        console.error(`File write failed for : ${utils_1.toolDownloaded[toolToBeUsed]}`);
     }
     return clientToolsDownloadPath;
 };
@@ -1197,13 +1368,31 @@ exports.appConst = {
     MAC_CONFIG_LOCATION: "smtools-mac-x64",
     SMCTL_DMG_LIB: "smctl.dmg",
     SMCTL_EXEC: "smctl",
+    SMPKCS_DMG_LIB: "smpkcs11.dmg",
+    SMPKCS_EXEC: "smpkcs11.dylib",
+    TOOL_EXECUTABLES: {
+        "smctl.dmg": "smctl",
+        "smpkcs11.dmg": "smpkcs11.dylib",
+    },
     MOUNT_VOL_NAME: "/Volumes/smctl-mac",
+    MOUNT_VOL_NAME_SMPKCS: "/Volumes/smpkcs11",
+    MOUNT_VOL_NAMES: {
+        "smctl.dmg": "/Volumes/smctl-mac",
+        "smpkcs11.dmg": "/Volumes/smpkcs11",
+    },
     MOUNTED_VOL_PATH: "smctl-mac-x64",
+    MOUNTED_VOL_PATH_SMPKCS: "smpkcs11.dylib",
+    MOUNT_VOL_PATHS: {
+        "smctl.dmg": "smctl-mac-x64",
+        "smpkcs11.dmg": "smpkcs11.dylib",
+    },
+    HASH_FILE_NAME: ".tool-hash",
     MOUNTING_ERROR: 300,
     COPY_ERROR: 301,
     EXEC_SET_ERROR: 302,
     VAR_IS_INSTALLATION_DIR_EXISTS: "isInstallationDirExists",
     VAR_FORCE_DOWNLOAD_TOOLS: "forceDownloadTools",
+    VAR_FORCE_INSTALL_TOOL: "forceInstallTool",
 };
 exports.OSTypeMapper = {
     [azure_pipelines_task_lib_1.Platform.Windows.toString()]: "win32",
@@ -12404,6 +12593,979 @@ module.exports = $gOPD;
 
 /***/ }),
 
+/***/ 1146:
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = clone
+
+var getPrototypeOf = Object.getPrototypeOf || function (obj) {
+  return obj.__proto__
+}
+
+function clone (obj) {
+  if (obj === null || typeof obj !== 'object')
+    return obj
+
+  if (obj instanceof Object)
+    var copy = { __proto__: getPrototypeOf(obj) }
+  else
+    var copy = Object.create(null)
+
+  Object.getOwnPropertyNames(obj).forEach(function (key) {
+    Object.defineProperty(copy, key, Object.getOwnPropertyDescriptor(obj, key))
+  })
+
+  return copy
+}
+
+
+/***/ }),
+
+/***/ 1541:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var fs = __nccwpck_require__(7147)
+var polyfills = __nccwpck_require__(8226)
+var legacy = __nccwpck_require__(1647)
+var clone = __nccwpck_require__(1146)
+
+var util = __nccwpck_require__(3837)
+
+/* istanbul ignore next - node 0.x polyfill */
+var gracefulQueue
+var previousSymbol
+
+/* istanbul ignore else - node 0.x polyfill */
+if (typeof Symbol === 'function' && typeof Symbol.for === 'function') {
+  gracefulQueue = Symbol.for('graceful-fs.queue')
+  // This is used in testing by future versions
+  previousSymbol = Symbol.for('graceful-fs.previous')
+} else {
+  gracefulQueue = '___graceful-fs.queue'
+  previousSymbol = '___graceful-fs.previous'
+}
+
+function noop () {}
+
+function publishQueue(context, queue) {
+  Object.defineProperty(context, gracefulQueue, {
+    get: function() {
+      return queue
+    }
+  })
+}
+
+var debug = noop
+if (util.debuglog)
+  debug = util.debuglog('gfs4')
+else if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || ''))
+  debug = function() {
+    var m = util.format.apply(util, arguments)
+    m = 'GFS4: ' + m.split(/\n/).join('\nGFS4: ')
+    console.error(m)
+  }
+
+// Once time initialization
+if (!fs[gracefulQueue]) {
+  // This queue can be shared by multiple loaded instances
+  var queue = global[gracefulQueue] || []
+  publishQueue(fs, queue)
+
+  // Patch fs.close/closeSync to shared queue version, because we need
+  // to retry() whenever a close happens *anywhere* in the program.
+  // This is essential when multiple graceful-fs instances are
+  // in play at the same time.
+  fs.close = (function (fs$close) {
+    function close (fd, cb) {
+      return fs$close.call(fs, fd, function (err) {
+        // This function uses the graceful-fs shared queue
+        if (!err) {
+          resetQueue()
+        }
+
+        if (typeof cb === 'function')
+          cb.apply(this, arguments)
+      })
+    }
+
+    Object.defineProperty(close, previousSymbol, {
+      value: fs$close
+    })
+    return close
+  })(fs.close)
+
+  fs.closeSync = (function (fs$closeSync) {
+    function closeSync (fd) {
+      // This function uses the graceful-fs shared queue
+      fs$closeSync.apply(fs, arguments)
+      resetQueue()
+    }
+
+    Object.defineProperty(closeSync, previousSymbol, {
+      value: fs$closeSync
+    })
+    return closeSync
+  })(fs.closeSync)
+
+  if (/\bgfs4\b/i.test(process.env.NODE_DEBUG || '')) {
+    process.on('exit', function() {
+      debug(fs[gracefulQueue])
+      __nccwpck_require__(9491).equal(fs[gracefulQueue].length, 0)
+    })
+  }
+}
+
+if (!global[gracefulQueue]) {
+  publishQueue(global, fs[gracefulQueue]);
+}
+
+module.exports = patch(clone(fs))
+if (process.env.TEST_GRACEFUL_FS_GLOBAL_PATCH && !fs.__patched) {
+    module.exports = patch(fs)
+    fs.__patched = true;
+}
+
+function patch (fs) {
+  // Everything that references the open() function needs to be in here
+  polyfills(fs)
+  fs.gracefulify = patch
+
+  fs.createReadStream = createReadStream
+  fs.createWriteStream = createWriteStream
+  var fs$readFile = fs.readFile
+  fs.readFile = readFile
+  function readFile (path, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$readFile(path, options, cb)
+
+    function go$readFile (path, options, cb, startTime) {
+      return fs$readFile(path, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$readFile, [path, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$writeFile = fs.writeFile
+  fs.writeFile = writeFile
+  function writeFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$writeFile(path, data, options, cb)
+
+    function go$writeFile (path, data, options, cb, startTime) {
+      return fs$writeFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$writeFile, [path, data, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$appendFile = fs.appendFile
+  if (fs$appendFile)
+    fs.appendFile = appendFile
+  function appendFile (path, data, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    return go$appendFile(path, data, options, cb)
+
+    function go$appendFile (path, data, options, cb, startTime) {
+      return fs$appendFile(path, data, options, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$appendFile, [path, data, options, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$copyFile = fs.copyFile
+  if (fs$copyFile)
+    fs.copyFile = copyFile
+  function copyFile (src, dest, flags, cb) {
+    if (typeof flags === 'function') {
+      cb = flags
+      flags = 0
+    }
+    return go$copyFile(src, dest, flags, cb)
+
+    function go$copyFile (src, dest, flags, cb, startTime) {
+      return fs$copyFile(src, dest, flags, function (err) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$copyFile, [src, dest, flags, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  var fs$readdir = fs.readdir
+  fs.readdir = readdir
+  var noReaddirOptionVersions = /^v[0-5]\./
+  function readdir (path, options, cb) {
+    if (typeof options === 'function')
+      cb = options, options = null
+
+    var go$readdir = noReaddirOptionVersions.test(process.version)
+      ? function go$readdir (path, options, cb, startTime) {
+        return fs$readdir(path, fs$readdirCallback(
+          path, options, cb, startTime
+        ))
+      }
+      : function go$readdir (path, options, cb, startTime) {
+        return fs$readdir(path, options, fs$readdirCallback(
+          path, options, cb, startTime
+        ))
+      }
+
+    return go$readdir(path, options, cb)
+
+    function fs$readdirCallback (path, options, cb, startTime) {
+      return function (err, files) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([
+            go$readdir,
+            [path, options, cb],
+            err,
+            startTime || Date.now(),
+            Date.now()
+          ])
+        else {
+          if (files && files.sort)
+            files.sort()
+
+          if (typeof cb === 'function')
+            cb.call(this, err, files)
+        }
+      }
+    }
+  }
+
+  if (process.version.substr(0, 4) === 'v0.8') {
+    var legStreams = legacy(fs)
+    ReadStream = legStreams.ReadStream
+    WriteStream = legStreams.WriteStream
+  }
+
+  var fs$ReadStream = fs.ReadStream
+  if (fs$ReadStream) {
+    ReadStream.prototype = Object.create(fs$ReadStream.prototype)
+    ReadStream.prototype.open = ReadStream$open
+  }
+
+  var fs$WriteStream = fs.WriteStream
+  if (fs$WriteStream) {
+    WriteStream.prototype = Object.create(fs$WriteStream.prototype)
+    WriteStream.prototype.open = WriteStream$open
+  }
+
+  Object.defineProperty(fs, 'ReadStream', {
+    get: function () {
+      return ReadStream
+    },
+    set: function (val) {
+      ReadStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+  Object.defineProperty(fs, 'WriteStream', {
+    get: function () {
+      return WriteStream
+    },
+    set: function (val) {
+      WriteStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+
+  // legacy names
+  var FileReadStream = ReadStream
+  Object.defineProperty(fs, 'FileReadStream', {
+    get: function () {
+      return FileReadStream
+    },
+    set: function (val) {
+      FileReadStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+  var FileWriteStream = WriteStream
+  Object.defineProperty(fs, 'FileWriteStream', {
+    get: function () {
+      return FileWriteStream
+    },
+    set: function (val) {
+      FileWriteStream = val
+    },
+    enumerable: true,
+    configurable: true
+  })
+
+  function ReadStream (path, options) {
+    if (this instanceof ReadStream)
+      return fs$ReadStream.apply(this, arguments), this
+    else
+      return ReadStream.apply(Object.create(ReadStream.prototype), arguments)
+  }
+
+  function ReadStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        if (that.autoClose)
+          that.destroy()
+
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+        that.read()
+      }
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (this instanceof WriteStream)
+      return fs$WriteStream.apply(this, arguments), this
+    else
+      return WriteStream.apply(Object.create(WriteStream.prototype), arguments)
+  }
+
+  function WriteStream$open () {
+    var that = this
+    open(that.path, that.flags, that.mode, function (err, fd) {
+      if (err) {
+        that.destroy()
+        that.emit('error', err)
+      } else {
+        that.fd = fd
+        that.emit('open', fd)
+      }
+    })
+  }
+
+  function createReadStream (path, options) {
+    return new fs.ReadStream(path, options)
+  }
+
+  function createWriteStream (path, options) {
+    return new fs.WriteStream(path, options)
+  }
+
+  var fs$open = fs.open
+  fs.open = open
+  function open (path, flags, mode, cb) {
+    if (typeof mode === 'function')
+      cb = mode, mode = null
+
+    return go$open(path, flags, mode, cb)
+
+    function go$open (path, flags, mode, cb, startTime) {
+      return fs$open(path, flags, mode, function (err, fd) {
+        if (err && (err.code === 'EMFILE' || err.code === 'ENFILE'))
+          enqueue([go$open, [path, flags, mode, cb], err, startTime || Date.now(), Date.now()])
+        else {
+          if (typeof cb === 'function')
+            cb.apply(this, arguments)
+        }
+      })
+    }
+  }
+
+  return fs
+}
+
+function enqueue (elem) {
+  debug('ENQUEUE', elem[0].name, elem[1])
+  fs[gracefulQueue].push(elem)
+  retry()
+}
+
+// keep track of the timeout between retry() calls
+var retryTimer
+
+// reset the startTime and lastTime to now
+// this resets the start of the 60 second overall timeout as well as the
+// delay between attempts so that we'll retry these jobs sooner
+function resetQueue () {
+  var now = Date.now()
+  for (var i = 0; i < fs[gracefulQueue].length; ++i) {
+    // entries that are only a length of 2 are from an older version, don't
+    // bother modifying those since they'll be retried anyway.
+    if (fs[gracefulQueue][i].length > 2) {
+      fs[gracefulQueue][i][3] = now // startTime
+      fs[gracefulQueue][i][4] = now // lastTime
+    }
+  }
+  // call retry to make sure we're actively processing the queue
+  retry()
+}
+
+function retry () {
+  // clear the timer and remove it to help prevent unintended concurrency
+  clearTimeout(retryTimer)
+  retryTimer = undefined
+
+  if (fs[gracefulQueue].length === 0)
+    return
+
+  var elem = fs[gracefulQueue].shift()
+  var fn = elem[0]
+  var args = elem[1]
+  // these items may be unset if they were added by an older graceful-fs
+  var err = elem[2]
+  var startTime = elem[3]
+  var lastTime = elem[4]
+
+  // if we don't have a startTime we have no way of knowing if we've waited
+  // long enough, so go ahead and retry this item now
+  if (startTime === undefined) {
+    debug('RETRY', fn.name, args)
+    fn.apply(null, args)
+  } else if (Date.now() - startTime >= 60000) {
+    // it's been more than 60 seconds total, bail now
+    debug('TIMEOUT', fn.name, args)
+    var cb = args.pop()
+    if (typeof cb === 'function')
+      cb.call(null, err)
+  } else {
+    // the amount of time between the last attempt and right now
+    var sinceAttempt = Date.now() - lastTime
+    // the amount of time between when we first tried, and when we last tried
+    // rounded up to at least 1
+    var sinceStart = Math.max(lastTime - startTime, 1)
+    // backoff. wait longer than the total time we've been retrying, but only
+    // up to a maximum of 100ms
+    var desiredDelay = Math.min(sinceStart * 1.2, 100)
+    // it's been long enough since the last retry, do it again
+    if (sinceAttempt >= desiredDelay) {
+      debug('RETRY', fn.name, args)
+      fn.apply(null, args.concat([startTime]))
+    } else {
+      // if we can't do this job yet, push it to the end of the queue
+      // and let the next iteration check again
+      fs[gracefulQueue].push(elem)
+    }
+  }
+
+  // schedule our next run if one isn't already scheduled
+  if (retryTimer === undefined) {
+    retryTimer = setTimeout(retry, 0)
+  }
+}
+
+
+/***/ }),
+
+/***/ 1647:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var Stream = (__nccwpck_require__(2781).Stream)
+
+module.exports = legacy
+
+function legacy (fs) {
+  return {
+    ReadStream: ReadStream,
+    WriteStream: WriteStream
+  }
+
+  function ReadStream (path, options) {
+    if (!(this instanceof ReadStream)) return new ReadStream(path, options);
+
+    Stream.call(this);
+
+    var self = this;
+
+    this.path = path;
+    this.fd = null;
+    this.readable = true;
+    this.paused = false;
+
+    this.flags = 'r';
+    this.mode = 438; /*=0666*/
+    this.bufferSize = 64 * 1024;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.encoding) this.setEncoding(this.encoding);
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.end === undefined) {
+        this.end = Infinity;
+      } else if ('number' !== typeof this.end) {
+        throw TypeError('end must be a Number');
+      }
+
+      if (this.start > this.end) {
+        throw new Error('start must be <= end');
+      }
+
+      this.pos = this.start;
+    }
+
+    if (this.fd !== null) {
+      process.nextTick(function() {
+        self._read();
+      });
+      return;
+    }
+
+    fs.open(this.path, this.flags, this.mode, function (err, fd) {
+      if (err) {
+        self.emit('error', err);
+        self.readable = false;
+        return;
+      }
+
+      self.fd = fd;
+      self.emit('open', fd);
+      self._read();
+    })
+  }
+
+  function WriteStream (path, options) {
+    if (!(this instanceof WriteStream)) return new WriteStream(path, options);
+
+    Stream.call(this);
+
+    this.path = path;
+    this.fd = null;
+    this.writable = true;
+
+    this.flags = 'w';
+    this.encoding = 'binary';
+    this.mode = 438; /*=0666*/
+    this.bytesWritten = 0;
+
+    options = options || {};
+
+    // Mixin options into this
+    var keys = Object.keys(options);
+    for (var index = 0, length = keys.length; index < length; index++) {
+      var key = keys[index];
+      this[key] = options[key];
+    }
+
+    if (this.start !== undefined) {
+      if ('number' !== typeof this.start) {
+        throw TypeError('start must be a Number');
+      }
+      if (this.start < 0) {
+        throw new Error('start must be >= zero');
+      }
+
+      this.pos = this.start;
+    }
+
+    this.busy = false;
+    this._queue = [];
+
+    if (this.fd === null) {
+      this._open = fs.open;
+      this._queue.push([this._open, this.path, this.flags, this.mode, undefined]);
+      this.flush();
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ 8226:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+var constants = __nccwpck_require__(2057)
+
+var origCwd = process.cwd
+var cwd = null
+
+var platform = process.env.GRACEFUL_FS_PLATFORM || process.platform
+
+process.cwd = function() {
+  if (!cwd)
+    cwd = origCwd.call(process)
+  return cwd
+}
+try {
+  process.cwd()
+} catch (er) {}
+
+// This check is needed until node.js 12 is required
+if (typeof process.chdir === 'function') {
+  var chdir = process.chdir
+  process.chdir = function (d) {
+    cwd = null
+    chdir.call(process, d)
+  }
+  if (Object.setPrototypeOf) Object.setPrototypeOf(process.chdir, chdir)
+}
+
+module.exports = patch
+
+function patch (fs) {
+  // (re-)implement some things that are known busted or missing.
+
+  // lchmod, broken prior to 0.6.2
+  // back-port the fix here.
+  if (constants.hasOwnProperty('O_SYMLINK') &&
+      process.version.match(/^v0\.6\.[0-2]|^v0\.5\./)) {
+    patchLchmod(fs)
+  }
+
+  // lutimes implementation, or no-op
+  if (!fs.lutimes) {
+    patchLutimes(fs)
+  }
+
+  // https://github.com/isaacs/node-graceful-fs/issues/4
+  // Chown should not fail on einval or eperm if non-root.
+  // It should not fail on enosys ever, as this just indicates
+  // that a fs doesn't support the intended operation.
+
+  fs.chown = chownFix(fs.chown)
+  fs.fchown = chownFix(fs.fchown)
+  fs.lchown = chownFix(fs.lchown)
+
+  fs.chmod = chmodFix(fs.chmod)
+  fs.fchmod = chmodFix(fs.fchmod)
+  fs.lchmod = chmodFix(fs.lchmod)
+
+  fs.chownSync = chownFixSync(fs.chownSync)
+  fs.fchownSync = chownFixSync(fs.fchownSync)
+  fs.lchownSync = chownFixSync(fs.lchownSync)
+
+  fs.chmodSync = chmodFixSync(fs.chmodSync)
+  fs.fchmodSync = chmodFixSync(fs.fchmodSync)
+  fs.lchmodSync = chmodFixSync(fs.lchmodSync)
+
+  fs.stat = statFix(fs.stat)
+  fs.fstat = statFix(fs.fstat)
+  fs.lstat = statFix(fs.lstat)
+
+  fs.statSync = statFixSync(fs.statSync)
+  fs.fstatSync = statFixSync(fs.fstatSync)
+  fs.lstatSync = statFixSync(fs.lstatSync)
+
+  // if lchmod/lchown do not exist, then make them no-ops
+  if (fs.chmod && !fs.lchmod) {
+    fs.lchmod = function (path, mode, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchmodSync = function () {}
+  }
+  if (fs.chown && !fs.lchown) {
+    fs.lchown = function (path, uid, gid, cb) {
+      if (cb) process.nextTick(cb)
+    }
+    fs.lchownSync = function () {}
+  }
+
+  // on Windows, A/V software can lock the directory, causing this
+  // to fail with an EACCES or EPERM if the directory contains newly
+  // created files.  Try again on failure, for up to 60 seconds.
+
+  // Set the timeout this long because some Windows Anti-Virus, such as Parity
+  // bit9, may lock files for up to a minute, causing npm package install
+  // failures. Also, take care to yield the scheduler. Windows scheduling gives
+  // CPU to a busy looping process, which can cause the program causing the lock
+  // contention to be starved of CPU by node, so the contention doesn't resolve.
+  if (platform === "win32") {
+    fs.rename = typeof fs.rename !== 'function' ? fs.rename
+    : (function (fs$rename) {
+      function rename (from, to, cb) {
+        var start = Date.now()
+        var backoff = 0;
+        fs$rename(from, to, function CB (er) {
+          if (er
+              && (er.code === "EACCES" || er.code === "EPERM")
+              && Date.now() - start < 60000) {
+            setTimeout(function() {
+              fs.stat(to, function (stater, st) {
+                if (stater && stater.code === "ENOENT")
+                  fs$rename(from, to, CB);
+                else
+                  cb(er)
+              })
+            }, backoff)
+            if (backoff < 100)
+              backoff += 10;
+            return;
+          }
+          if (cb) cb(er)
+        })
+      }
+      if (Object.setPrototypeOf) Object.setPrototypeOf(rename, fs$rename)
+      return rename
+    })(fs.rename)
+  }
+
+  // if read() returns EAGAIN, then just try it again.
+  fs.read = typeof fs.read !== 'function' ? fs.read
+  : (function (fs$read) {
+    function read (fd, buffer, offset, length, position, callback_) {
+      var callback
+      if (callback_ && typeof callback_ === 'function') {
+        var eagCounter = 0
+        callback = function (er, _, __) {
+          if (er && er.code === 'EAGAIN' && eagCounter < 10) {
+            eagCounter ++
+            return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+          }
+          callback_.apply(this, arguments)
+        }
+      }
+      return fs$read.call(fs, fd, buffer, offset, length, position, callback)
+    }
+
+    // This ensures `util.promisify` works as it does for native `fs.read`.
+    if (Object.setPrototypeOf) Object.setPrototypeOf(read, fs$read)
+    return read
+  })(fs.read)
+
+  fs.readSync = typeof fs.readSync !== 'function' ? fs.readSync
+  : (function (fs$readSync) { return function (fd, buffer, offset, length, position) {
+    var eagCounter = 0
+    while (true) {
+      try {
+        return fs$readSync.call(fs, fd, buffer, offset, length, position)
+      } catch (er) {
+        if (er.code === 'EAGAIN' && eagCounter < 10) {
+          eagCounter ++
+          continue
+        }
+        throw er
+      }
+    }
+  }})(fs.readSync)
+
+  function patchLchmod (fs) {
+    fs.lchmod = function (path, mode, callback) {
+      fs.open( path
+             , constants.O_WRONLY | constants.O_SYMLINK
+             , mode
+             , function (err, fd) {
+        if (err) {
+          if (callback) callback(err)
+          return
+        }
+        // prefer to return the chmod error, if one occurs,
+        // but still try to close, and report closing errors if they occur.
+        fs.fchmod(fd, mode, function (err) {
+          fs.close(fd, function(err2) {
+            if (callback) callback(err || err2)
+          })
+        })
+      })
+    }
+
+    fs.lchmodSync = function (path, mode) {
+      var fd = fs.openSync(path, constants.O_WRONLY | constants.O_SYMLINK, mode)
+
+      // prefer to return the chmod error, if one occurs,
+      // but still try to close, and report closing errors if they occur.
+      var threw = true
+      var ret
+      try {
+        ret = fs.fchmodSync(fd, mode)
+        threw = false
+      } finally {
+        if (threw) {
+          try {
+            fs.closeSync(fd)
+          } catch (er) {}
+        } else {
+          fs.closeSync(fd)
+        }
+      }
+      return ret
+    }
+  }
+
+  function patchLutimes (fs) {
+    if (constants.hasOwnProperty("O_SYMLINK") && fs.futimes) {
+      fs.lutimes = function (path, at, mt, cb) {
+        fs.open(path, constants.O_SYMLINK, function (er, fd) {
+          if (er) {
+            if (cb) cb(er)
+            return
+          }
+          fs.futimes(fd, at, mt, function (er) {
+            fs.close(fd, function (er2) {
+              if (cb) cb(er || er2)
+            })
+          })
+        })
+      }
+
+      fs.lutimesSync = function (path, at, mt) {
+        var fd = fs.openSync(path, constants.O_SYMLINK)
+        var ret
+        var threw = true
+        try {
+          ret = fs.futimesSync(fd, at, mt)
+          threw = false
+        } finally {
+          if (threw) {
+            try {
+              fs.closeSync(fd)
+            } catch (er) {}
+          } else {
+            fs.closeSync(fd)
+          }
+        }
+        return ret
+      }
+
+    } else if (fs.futimes) {
+      fs.lutimes = function (_a, _b, _c, cb) { if (cb) process.nextTick(cb) }
+      fs.lutimesSync = function () {}
+    }
+  }
+
+  function chmodFix (orig) {
+    if (!orig) return orig
+    return function (target, mode, cb) {
+      return orig.call(fs, target, mode, function (er) {
+        if (chownErOk(er)) er = null
+        if (cb) cb.apply(this, arguments)
+      })
+    }
+  }
+
+  function chmodFixSync (orig) {
+    if (!orig) return orig
+    return function (target, mode) {
+      try {
+        return orig.call(fs, target, mode)
+      } catch (er) {
+        if (!chownErOk(er)) throw er
+      }
+    }
+  }
+
+
+  function chownFix (orig) {
+    if (!orig) return orig
+    return function (target, uid, gid, cb) {
+      return orig.call(fs, target, uid, gid, function (er) {
+        if (chownErOk(er)) er = null
+        if (cb) cb.apply(this, arguments)
+      })
+    }
+  }
+
+  function chownFixSync (orig) {
+    if (!orig) return orig
+    return function (target, uid, gid) {
+      try {
+        return orig.call(fs, target, uid, gid)
+      } catch (er) {
+        if (!chownErOk(er)) throw er
+      }
+    }
+  }
+
+  function statFix (orig) {
+    if (!orig) return orig
+    // Older versions of Node erroneously returned signed integers for
+    // uid + gid.
+    return function (target, options, cb) {
+      if (typeof options === 'function') {
+        cb = options
+        options = null
+      }
+      function callback (er, stats) {
+        if (stats) {
+          if (stats.uid < 0) stats.uid += 0x100000000
+          if (stats.gid < 0) stats.gid += 0x100000000
+        }
+        if (cb) cb.apply(this, arguments)
+      }
+      return options ? orig.call(fs, target, options, callback)
+        : orig.call(fs, target, callback)
+    }
+  }
+
+  function statFixSync (orig) {
+    if (!orig) return orig
+    // Older versions of Node erroneously returned signed integers for
+    // uid + gid.
+    return function (target, options) {
+      var stats = options ? orig.call(fs, target, options)
+        : orig.call(fs, target)
+      if (stats) {
+        if (stats.uid < 0) stats.uid += 0x100000000
+        if (stats.gid < 0) stats.gid += 0x100000000
+      }
+      return stats;
+    }
+  }
+
+  // ENOSYS means that the fs doesn't support the op. Just ignore
+  // that, because it doesn't matter.
+  //
+  // if there's no getuid, or if getuid() is something other
+  // than 0, and the error is EINVAL or EPERM, then just ignore
+  // it.
+  //
+  // This specific case is a silent failure in cp, install, tar,
+  // and most other unix tools that manage permissions.
+  //
+  // When running as root, or if other types of errors are
+  // encountered, then it's strict.
+  function chownErOk (er) {
+    if (!er)
+      return true
+
+    if (er.code === "ENOSYS")
+      return true
+
+    var nonroot = !process.getuid || process.getuid() !== 0
+    if (nonroot) {
+      if (er.code === "EINVAL" || er.code === "EPERM")
+        return true
+    }
+
+    return false
+  }
+}
+
+
+/***/ }),
+
 /***/ 1460:
 /***/ ((module) => {
 
@@ -14158,6 +15320,560 @@ function win32(path) {
 module.exports = process.platform === 'win32' ? win32 : posix;
 module.exports.posix = posix;
 module.exports.win32 = win32;
+
+
+/***/ }),
+
+/***/ 2147:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const lockfile = __nccwpck_require__(792);
+const { toPromise, toSync, toSyncOptions } = __nccwpck_require__(7398);
+
+async function lock(file, options) {
+    const release = await toPromise(lockfile.lock)(file, options);
+
+    return toPromise(release);
+}
+
+function lockSync(file, options) {
+    const release = toSync(lockfile.lock)(file, toSyncOptions(options));
+
+    return toSync(release);
+}
+
+function unlock(file, options) {
+    return toPromise(lockfile.unlock)(file, options);
+}
+
+function unlockSync(file, options) {
+    return toSync(lockfile.unlock)(file, toSyncOptions(options));
+}
+
+function check(file, options) {
+    return toPromise(lockfile.check)(file, options);
+}
+
+function checkSync(file, options) {
+    return toSync(lockfile.check)(file, toSyncOptions(options));
+}
+
+module.exports = lock;
+module.exports.lock = lock;
+module.exports.unlock = unlock;
+module.exports.lockSync = lockSync;
+module.exports.unlockSync = unlockSync;
+module.exports.check = check;
+module.exports.checkSync = checkSync;
+
+
+/***/ }),
+
+/***/ 7398:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const fs = __nccwpck_require__(1541);
+
+function createSyncFs(fs) {
+    const methods = ['mkdir', 'realpath', 'stat', 'rmdir', 'utimes'];
+    const newFs = { ...fs };
+
+    methods.forEach((method) => {
+        newFs[method] = (...args) => {
+            const callback = args.pop();
+            let ret;
+
+            try {
+                ret = fs[`${method}Sync`](...args);
+            } catch (err) {
+                return callback(err);
+            }
+
+            callback(null, ret);
+        };
+    });
+
+    return newFs;
+}
+
+// ----------------------------------------------------------
+
+function toPromise(method) {
+    return (...args) => new Promise((resolve, reject) => {
+        args.push((err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+
+        method(...args);
+    });
+}
+
+function toSync(method) {
+    return (...args) => {
+        let err;
+        let result;
+
+        args.push((_err, _result) => {
+            err = _err;
+            result = _result;
+        });
+
+        method(...args);
+
+        if (err) {
+            throw err;
+        }
+
+        return result;
+    };
+}
+
+function toSyncOptions(options) {
+    // Shallow clone options because we are oging to mutate them
+    options = { ...options };
+
+    // Transform fs to use the sync methods instead
+    options.fs = createSyncFs(options.fs || fs);
+
+    // Retries are not allowed because it requires the flow to be sync
+    if (
+        (typeof options.retries === 'number' && options.retries > 0) ||
+        (options.retries && typeof options.retries.retries === 'number' && options.retries.retries > 0)
+    ) {
+        throw Object.assign(new Error('Cannot use retries with the sync api'), { code: 'ESYNC' });
+    }
+
+    return options;
+}
+
+module.exports = {
+    toPromise,
+    toSync,
+    toSyncOptions,
+};
+
+
+/***/ }),
+
+/***/ 792:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+"use strict";
+
+
+const path = __nccwpck_require__(1017);
+const fs = __nccwpck_require__(1541);
+const retry = __nccwpck_require__(2981);
+const onExit = __nccwpck_require__(1033);
+const mtimePrecision = __nccwpck_require__(4380);
+
+const locks = {};
+
+function getLockFile(file, options) {
+    return options.lockfilePath || `${file}.lock`;
+}
+
+function resolveCanonicalPath(file, options, callback) {
+    if (!options.realpath) {
+        return callback(null, path.resolve(file));
+    }
+
+    // Use realpath to resolve symlinks
+    // It also resolves relative paths
+    options.fs.realpath(file, callback);
+}
+
+function acquireLock(file, options, callback) {
+    const lockfilePath = getLockFile(file, options);
+
+    // Use mkdir to create the lockfile (atomic operation)
+    options.fs.mkdir(lockfilePath, (err) => {
+        if (!err) {
+            // At this point, we acquired the lock!
+            // Probe the mtime precision
+            return mtimePrecision.probe(lockfilePath, options.fs, (err, mtime, mtimePrecision) => {
+                // If it failed, try to remove the lock..
+                /* istanbul ignore if */
+                if (err) {
+                    options.fs.rmdir(lockfilePath, () => {});
+
+                    return callback(err);
+                }
+
+                callback(null, mtime, mtimePrecision);
+            });
+        }
+
+        // If error is not EEXIST then some other error occurred while locking
+        if (err.code !== 'EEXIST') {
+            return callback(err);
+        }
+
+        // Otherwise, check if lock is stale by analyzing the file mtime
+        if (options.stale <= 0) {
+            return callback(Object.assign(new Error('Lock file is already being held'), { code: 'ELOCKED', file }));
+        }
+
+        options.fs.stat(lockfilePath, (err, stat) => {
+            if (err) {
+                // Retry if the lockfile has been removed (meanwhile)
+                // Skip stale check to avoid recursiveness
+                if (err.code === 'ENOENT') {
+                    return acquireLock(file, { ...options, stale: 0 }, callback);
+                }
+
+                return callback(err);
+            }
+
+            if (!isLockStale(stat, options)) {
+                return callback(Object.assign(new Error('Lock file is already being held'), { code: 'ELOCKED', file }));
+            }
+
+            // If it's stale, remove it and try again!
+            // Skip stale check to avoid recursiveness
+            removeLock(file, options, (err) => {
+                if (err) {
+                    return callback(err);
+                }
+
+                acquireLock(file, { ...options, stale: 0 }, callback);
+            });
+        });
+    });
+}
+
+function isLockStale(stat, options) {
+    return stat.mtime.getTime() < Date.now() - options.stale;
+}
+
+function removeLock(file, options, callback) {
+    // Remove lockfile, ignoring ENOENT errors
+    options.fs.rmdir(getLockFile(file, options), (err) => {
+        if (err && err.code !== 'ENOENT') {
+            return callback(err);
+        }
+
+        callback();
+    });
+}
+
+function updateLock(file, options) {
+    const lock = locks[file];
+
+    // Just for safety, should never happen
+    /* istanbul ignore if */
+    if (lock.updateTimeout) {
+        return;
+    }
+
+    lock.updateDelay = lock.updateDelay || options.update;
+    lock.updateTimeout = setTimeout(() => {
+        lock.updateTimeout = null;
+
+        // Stat the file to check if mtime is still ours
+        // If it is, we can still recover from a system sleep or a busy event loop
+        options.fs.stat(lock.lockfilePath, (err, stat) => {
+            const isOverThreshold = lock.lastUpdate + options.stale < Date.now();
+
+            // If it failed to update the lockfile, keep trying unless
+            // the lockfile was deleted or we are over the threshold
+            if (err) {
+                if (err.code === 'ENOENT' || isOverThreshold) {
+                    return setLockAsCompromised(file, lock, Object.assign(err, { code: 'ECOMPROMISED' }));
+                }
+
+                lock.updateDelay = 1000;
+
+                return updateLock(file, options);
+            }
+
+            const isMtimeOurs = lock.mtime.getTime() === stat.mtime.getTime();
+
+            if (!isMtimeOurs) {
+                return setLockAsCompromised(
+                    file,
+                    lock,
+                    Object.assign(
+                        new Error('Unable to update lock within the stale threshold'),
+                        { code: 'ECOMPROMISED' }
+                    ));
+            }
+
+            const mtime = mtimePrecision.getMtime(lock.mtimePrecision);
+
+            options.fs.utimes(lock.lockfilePath, mtime, mtime, (err) => {
+                const isOverThreshold = lock.lastUpdate + options.stale < Date.now();
+
+                // Ignore if the lock was released
+                if (lock.released) {
+                    return;
+                }
+
+                // If it failed to update the lockfile, keep trying unless
+                // the lockfile was deleted or we are over the threshold
+                if (err) {
+                    if (err.code === 'ENOENT' || isOverThreshold) {
+                        return setLockAsCompromised(file, lock, Object.assign(err, { code: 'ECOMPROMISED' }));
+                    }
+
+                    lock.updateDelay = 1000;
+
+                    return updateLock(file, options);
+                }
+
+                // All ok, keep updating..
+                lock.mtime = mtime;
+                lock.lastUpdate = Date.now();
+                lock.updateDelay = null;
+                updateLock(file, options);
+            });
+        });
+    }, lock.updateDelay);
+
+    // Unref the timer so that the nodejs process can exit freely
+    // This is safe because all acquired locks will be automatically released
+    // on process exit
+
+    // We first check that `lock.updateTimeout.unref` exists because some users
+    // may be using this module outside of NodeJS (e.g., in an electron app),
+    // and in those cases `setTimeout` return an integer.
+    /* istanbul ignore else */
+    if (lock.updateTimeout.unref) {
+        lock.updateTimeout.unref();
+    }
+}
+
+function setLockAsCompromised(file, lock, err) {
+    // Signal the lock has been released
+    lock.released = true;
+
+    // Cancel lock mtime update
+    // Just for safety, at this point updateTimeout should be null
+    /* istanbul ignore if */
+    if (lock.updateTimeout) {
+        clearTimeout(lock.updateTimeout);
+    }
+
+    if (locks[file] === lock) {
+        delete locks[file];
+    }
+
+    lock.options.onCompromised(err);
+}
+
+// ----------------------------------------------------------
+
+function lock(file, options, callback) {
+    /* istanbul ignore next */
+    options = {
+        stale: 10000,
+        update: null,
+        realpath: true,
+        retries: 0,
+        fs,
+        onCompromised: (err) => { throw err; },
+        ...options,
+    };
+
+    options.retries = options.retries || 0;
+    options.retries = typeof options.retries === 'number' ? { retries: options.retries } : options.retries;
+    options.stale = Math.max(options.stale || 0, 2000);
+    options.update = options.update == null ? options.stale / 2 : options.update || 0;
+    options.update = Math.max(Math.min(options.update, options.stale / 2), 1000);
+
+    // Resolve to a canonical file path
+    resolveCanonicalPath(file, options, (err, file) => {
+        if (err) {
+            return callback(err);
+        }
+
+        // Attempt to acquire the lock
+        const operation = retry.operation(options.retries);
+
+        operation.attempt(() => {
+            acquireLock(file, options, (err, mtime, mtimePrecision) => {
+                if (operation.retry(err)) {
+                    return;
+                }
+
+                if (err) {
+                    return callback(operation.mainError());
+                }
+
+                // We now own the lock
+                const lock = locks[file] = {
+                    lockfilePath: getLockFile(file, options),
+                    mtime,
+                    mtimePrecision,
+                    options,
+                    lastUpdate: Date.now(),
+                };
+
+                // We must keep the lock fresh to avoid staleness
+                updateLock(file, options);
+
+                callback(null, (releasedCallback) => {
+                    if (lock.released) {
+                        return releasedCallback &&
+                            releasedCallback(Object.assign(new Error('Lock is already released'), { code: 'ERELEASED' }));
+                    }
+
+                    // Not necessary to use realpath twice when unlocking
+                    unlock(file, { ...options, realpath: false }, releasedCallback);
+                });
+            });
+        });
+    });
+}
+
+function unlock(file, options, callback) {
+    options = {
+        fs,
+        realpath: true,
+        ...options,
+    };
+
+    // Resolve to a canonical file path
+    resolveCanonicalPath(file, options, (err, file) => {
+        if (err) {
+            return callback(err);
+        }
+
+        // Skip if the lock is not acquired
+        const lock = locks[file];
+
+        if (!lock) {
+            return callback(Object.assign(new Error('Lock is not acquired/owned by you'), { code: 'ENOTACQUIRED' }));
+        }
+
+        lock.updateTimeout && clearTimeout(lock.updateTimeout); // Cancel lock mtime update
+        lock.released = true; // Signal the lock has been released
+        delete locks[file]; // Delete from locks
+
+        removeLock(file, options, callback);
+    });
+}
+
+function check(file, options, callback) {
+    options = {
+        stale: 10000,
+        realpath: true,
+        fs,
+        ...options,
+    };
+
+    options.stale = Math.max(options.stale || 0, 2000);
+
+    // Resolve to a canonical file path
+    resolveCanonicalPath(file, options, (err, file) => {
+        if (err) {
+            return callback(err);
+        }
+
+        // Check if lockfile exists
+        options.fs.stat(getLockFile(file, options), (err, stat) => {
+            if (err) {
+                // If does not exist, file is not locked. Otherwise, callback with error
+                return err.code === 'ENOENT' ? callback(null, false) : callback(err);
+            }
+
+            // Otherwise, check if lock is stale by analyzing the file mtime
+            return callback(null, !isLockStale(stat, options));
+        });
+    });
+}
+
+function getLocks() {
+    return locks;
+}
+
+// Remove acquired locks on exit
+/* istanbul ignore next */
+onExit(() => {
+    for (const file in locks) {
+        const options = locks[file].options;
+
+        try { options.fs.rmdirSync(getLockFile(file, options)); } catch (e) { /* Empty */ }
+    }
+});
+
+module.exports.lock = lock;
+module.exports.unlock = unlock;
+module.exports.check = check;
+module.exports.getLocks = getLocks;
+
+
+/***/ }),
+
+/***/ 4380:
+/***/ ((module) => {
+
+"use strict";
+
+
+const cacheSymbol = Symbol();
+
+function probe(file, fs, callback) {
+    const cachedPrecision = fs[cacheSymbol];
+
+    if (cachedPrecision) {
+        return fs.stat(file, (err, stat) => {
+            /* istanbul ignore if */
+            if (err) {
+                return callback(err);
+            }
+
+            callback(null, stat.mtime, cachedPrecision);
+        });
+    }
+
+    // Set mtime by ceiling Date.now() to seconds + 5ms so that it's "not on the second"
+    const mtime = new Date((Math.ceil(Date.now() / 1000) * 1000) + 5);
+
+    fs.utimes(file, mtime, mtime, (err) => {
+        /* istanbul ignore if */
+        if (err) {
+            return callback(err);
+        }
+
+        fs.stat(file, (err, stat) => {
+            /* istanbul ignore if */
+            if (err) {
+                return callback(err);
+            }
+
+            const precision = stat.mtime.getTime() % 1000 === 0 ? 's' : 'ms';
+
+            // Cache the precision in a non-enumerable way
+            Object.defineProperty(fs, cacheSymbol, { value: precision });
+
+            callback(null, stat.mtime, precision);
+        });
+    });
+}
+
+function getMtime(precision) {
+    let now = Date.now();
+
+    if (precision === 's') {
+        now = Math.ceil(now / 1000) * 1000;
+    }
+
+    return new Date(now);
+}
+
+module.exports.probe = probe;
+module.exports.getMtime = getMtime;
 
 
 /***/ }),
@@ -16326,6 +18042,285 @@ var qEndingLine = captureLine();
 return Q;
 
 });
+
+
+/***/ }),
+
+/***/ 2981:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+module.exports = __nccwpck_require__(4057);
+
+/***/ }),
+
+/***/ 4057:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+var RetryOperation = __nccwpck_require__(2734);
+
+exports.operation = function(options) {
+  var timeouts = exports.timeouts(options);
+  return new RetryOperation(timeouts, {
+      forever: options && options.forever,
+      unref: options && options.unref,
+      maxRetryTime: options && options.maxRetryTime
+  });
+};
+
+exports.timeouts = function(options) {
+  if (options instanceof Array) {
+    return [].concat(options);
+  }
+
+  var opts = {
+    retries: 10,
+    factor: 2,
+    minTimeout: 1 * 1000,
+    maxTimeout: Infinity,
+    randomize: false
+  };
+  for (var key in options) {
+    opts[key] = options[key];
+  }
+
+  if (opts.minTimeout > opts.maxTimeout) {
+    throw new Error('minTimeout is greater than maxTimeout');
+  }
+
+  var timeouts = [];
+  for (var i = 0; i < opts.retries; i++) {
+    timeouts.push(this.createTimeout(i, opts));
+  }
+
+  if (options && options.forever && !timeouts.length) {
+    timeouts.push(this.createTimeout(i, opts));
+  }
+
+  // sort the array numerically ascending
+  timeouts.sort(function(a,b) {
+    return a - b;
+  });
+
+  return timeouts;
+};
+
+exports.createTimeout = function(attempt, opts) {
+  var random = (opts.randomize)
+    ? (Math.random() + 1)
+    : 1;
+
+  var timeout = Math.round(random * opts.minTimeout * Math.pow(opts.factor, attempt));
+  timeout = Math.min(timeout, opts.maxTimeout);
+
+  return timeout;
+};
+
+exports.wrap = function(obj, options, methods) {
+  if (options instanceof Array) {
+    methods = options;
+    options = null;
+  }
+
+  if (!methods) {
+    methods = [];
+    for (var key in obj) {
+      if (typeof obj[key] === 'function') {
+        methods.push(key);
+      }
+    }
+  }
+
+  for (var i = 0; i < methods.length; i++) {
+    var method   = methods[i];
+    var original = obj[method];
+
+    obj[method] = function retryWrapper(original) {
+      var op       = exports.operation(options);
+      var args     = Array.prototype.slice.call(arguments, 1);
+      var callback = args.pop();
+
+      args.push(function(err) {
+        if (op.retry(err)) {
+          return;
+        }
+        if (err) {
+          arguments[0] = op.mainError();
+        }
+        callback.apply(this, arguments);
+      });
+
+      op.attempt(function() {
+        original.apply(obj, args);
+      });
+    }.bind(obj, original);
+    obj[method].options = options;
+  }
+};
+
+
+/***/ }),
+
+/***/ 2734:
+/***/ ((module) => {
+
+function RetryOperation(timeouts, options) {
+  // Compatibility for the old (timeouts, retryForever) signature
+  if (typeof options === 'boolean') {
+    options = { forever: options };
+  }
+
+  this._originalTimeouts = JSON.parse(JSON.stringify(timeouts));
+  this._timeouts = timeouts;
+  this._options = options || {};
+  this._maxRetryTime = options && options.maxRetryTime || Infinity;
+  this._fn = null;
+  this._errors = [];
+  this._attempts = 1;
+  this._operationTimeout = null;
+  this._operationTimeoutCb = null;
+  this._timeout = null;
+  this._operationStart = null;
+
+  if (this._options.forever) {
+    this._cachedTimeouts = this._timeouts.slice(0);
+  }
+}
+module.exports = RetryOperation;
+
+RetryOperation.prototype.reset = function() {
+  this._attempts = 1;
+  this._timeouts = this._originalTimeouts;
+}
+
+RetryOperation.prototype.stop = function() {
+  if (this._timeout) {
+    clearTimeout(this._timeout);
+  }
+
+  this._timeouts       = [];
+  this._cachedTimeouts = null;
+};
+
+RetryOperation.prototype.retry = function(err) {
+  if (this._timeout) {
+    clearTimeout(this._timeout);
+  }
+
+  if (!err) {
+    return false;
+  }
+  var currentTime = new Date().getTime();
+  if (err && currentTime - this._operationStart >= this._maxRetryTime) {
+    this._errors.unshift(new Error('RetryOperation timeout occurred'));
+    return false;
+  }
+
+  this._errors.push(err);
+
+  var timeout = this._timeouts.shift();
+  if (timeout === undefined) {
+    if (this._cachedTimeouts) {
+      // retry forever, only keep last error
+      this._errors.splice(this._errors.length - 1, this._errors.length);
+      this._timeouts = this._cachedTimeouts.slice(0);
+      timeout = this._timeouts.shift();
+    } else {
+      return false;
+    }
+  }
+
+  var self = this;
+  var timer = setTimeout(function() {
+    self._attempts++;
+
+    if (self._operationTimeoutCb) {
+      self._timeout = setTimeout(function() {
+        self._operationTimeoutCb(self._attempts);
+      }, self._operationTimeout);
+
+      if (self._options.unref) {
+          self._timeout.unref();
+      }
+    }
+
+    self._fn(self._attempts);
+  }, timeout);
+
+  if (this._options.unref) {
+      timer.unref();
+  }
+
+  return true;
+};
+
+RetryOperation.prototype.attempt = function(fn, timeoutOps) {
+  this._fn = fn;
+
+  if (timeoutOps) {
+    if (timeoutOps.timeout) {
+      this._operationTimeout = timeoutOps.timeout;
+    }
+    if (timeoutOps.cb) {
+      this._operationTimeoutCb = timeoutOps.cb;
+    }
+  }
+
+  var self = this;
+  if (this._operationTimeoutCb) {
+    this._timeout = setTimeout(function() {
+      self._operationTimeoutCb();
+    }, self._operationTimeout);
+  }
+
+  this._operationStart = new Date().getTime();
+
+  this._fn(this._attempts);
+};
+
+RetryOperation.prototype.try = function(fn) {
+  console.log('Using RetryOperation.try() is deprecated');
+  this.attempt(fn);
+};
+
+RetryOperation.prototype.start = function(fn) {
+  console.log('Using RetryOperation.start() is deprecated');
+  this.attempt(fn);
+};
+
+RetryOperation.prototype.start = RetryOperation.prototype.try;
+
+RetryOperation.prototype.errors = function() {
+  return this._errors;
+};
+
+RetryOperation.prototype.attempts = function() {
+  return this._attempts;
+};
+
+RetryOperation.prototype.mainError = function() {
+  if (this._errors.length === 0) {
+    return null;
+  }
+
+  var counts = {};
+  var mainError = null;
+  var mainErrorCount = 0;
+
+  for (var i = 0; i < this._errors.length; i++) {
+    var error = this._errors[i];
+    var message = error.message;
+    var count = (counts[message] || 0) + 1;
+
+    counts[message] = count;
+
+    if (count >= mainErrorCount) {
+      mainError = error;
+      mainErrorCount = count;
+    }
+  }
+
+  return mainError;
+};
 
 
 /***/ }),
@@ -21745,6 +23740,275 @@ module.exports = _which;
 
 /***/ }),
 
+/***/ 1033:
+/***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
+
+// Note: since nyc uses this module to output coverage, any lines
+// that are in the direct sync flow of nyc's outputCoverage are
+// ignored, since we can never get coverage for them.
+// grab a reference to node's real process object right away
+var process = global.process
+
+const processOk = function (process) {
+  return process &&
+    typeof process === 'object' &&
+    typeof process.removeListener === 'function' &&
+    typeof process.emit === 'function' &&
+    typeof process.reallyExit === 'function' &&
+    typeof process.listeners === 'function' &&
+    typeof process.kill === 'function' &&
+    typeof process.pid === 'number' &&
+    typeof process.on === 'function'
+}
+
+// some kind of non-node environment, just no-op
+/* istanbul ignore if */
+if (!processOk(process)) {
+  module.exports = function () {
+    return function () {}
+  }
+} else {
+  var assert = __nccwpck_require__(9491)
+  var signals = __nccwpck_require__(9728)
+  var isWin = /^win/i.test(process.platform)
+
+  var EE = __nccwpck_require__(2361)
+  /* istanbul ignore if */
+  if (typeof EE !== 'function') {
+    EE = EE.EventEmitter
+  }
+
+  var emitter
+  if (process.__signal_exit_emitter__) {
+    emitter = process.__signal_exit_emitter__
+  } else {
+    emitter = process.__signal_exit_emitter__ = new EE()
+    emitter.count = 0
+    emitter.emitted = {}
+  }
+
+  // Because this emitter is a global, we have to check to see if a
+  // previous version of this library failed to enable infinite listeners.
+  // I know what you're about to say.  But literally everything about
+  // signal-exit is a compromise with evil.  Get used to it.
+  if (!emitter.infinite) {
+    emitter.setMaxListeners(Infinity)
+    emitter.infinite = true
+  }
+
+  module.exports = function (cb, opts) {
+    /* istanbul ignore if */
+    if (!processOk(global.process)) {
+      return function () {}
+    }
+    assert.equal(typeof cb, 'function', 'a callback must be provided for exit handler')
+
+    if (loaded === false) {
+      load()
+    }
+
+    var ev = 'exit'
+    if (opts && opts.alwaysLast) {
+      ev = 'afterexit'
+    }
+
+    var remove = function () {
+      emitter.removeListener(ev, cb)
+      if (emitter.listeners('exit').length === 0 &&
+          emitter.listeners('afterexit').length === 0) {
+        unload()
+      }
+    }
+    emitter.on(ev, cb)
+
+    return remove
+  }
+
+  var unload = function unload () {
+    if (!loaded || !processOk(global.process)) {
+      return
+    }
+    loaded = false
+
+    signals.forEach(function (sig) {
+      try {
+        process.removeListener(sig, sigListeners[sig])
+      } catch (er) {}
+    })
+    process.emit = originalProcessEmit
+    process.reallyExit = originalProcessReallyExit
+    emitter.count -= 1
+  }
+  module.exports.unload = unload
+
+  var emit = function emit (event, code, signal) {
+    /* istanbul ignore if */
+    if (emitter.emitted[event]) {
+      return
+    }
+    emitter.emitted[event] = true
+    emitter.emit(event, code, signal)
+  }
+
+  // { <signal>: <listener fn>, ... }
+  var sigListeners = {}
+  signals.forEach(function (sig) {
+    sigListeners[sig] = function listener () {
+      /* istanbul ignore if */
+      if (!processOk(global.process)) {
+        return
+      }
+      // If there are no other listeners, an exit is coming!
+      // Simplest way: remove us and then re-send the signal.
+      // We know that this will kill the process, so we can
+      // safely emit now.
+      var listeners = process.listeners(sig)
+      if (listeners.length === emitter.count) {
+        unload()
+        emit('exit', null, sig)
+        /* istanbul ignore next */
+        emit('afterexit', null, sig)
+        /* istanbul ignore next */
+        if (isWin && sig === 'SIGHUP') {
+          // "SIGHUP" throws an `ENOSYS` error on Windows,
+          // so use a supported signal instead
+          sig = 'SIGINT'
+        }
+        /* istanbul ignore next */
+        process.kill(process.pid, sig)
+      }
+    }
+  })
+
+  module.exports.signals = function () {
+    return signals
+  }
+
+  var loaded = false
+
+  var load = function load () {
+    if (loaded || !processOk(global.process)) {
+      return
+    }
+    loaded = true
+
+    // This is the number of onSignalExit's that are in play.
+    // It's important so that we can count the correct number of
+    // listeners on signals, and don't wait for the other one to
+    // handle it instead of us.
+    emitter.count += 1
+
+    signals = signals.filter(function (sig) {
+      try {
+        process.on(sig, sigListeners[sig])
+        return true
+      } catch (er) {
+        return false
+      }
+    })
+
+    process.emit = processEmit
+    process.reallyExit = processReallyExit
+  }
+  module.exports.load = load
+
+  var originalProcessReallyExit = process.reallyExit
+  var processReallyExit = function processReallyExit (code) {
+    /* istanbul ignore if */
+    if (!processOk(global.process)) {
+      return
+    }
+    process.exitCode = code || /* istanbul ignore next */ 0
+    emit('exit', process.exitCode, null)
+    /* istanbul ignore next */
+    emit('afterexit', process.exitCode, null)
+    /* istanbul ignore next */
+    originalProcessReallyExit.call(process, process.exitCode)
+  }
+
+  var originalProcessEmit = process.emit
+  var processEmit = function processEmit (ev, arg) {
+    if (ev === 'exit' && processOk(global.process)) {
+      /* istanbul ignore else */
+      if (arg !== undefined) {
+        process.exitCode = arg
+      }
+      var ret = originalProcessEmit.apply(this, arguments)
+      /* istanbul ignore next */
+      emit('exit', process.exitCode, null)
+      /* istanbul ignore next */
+      emit('afterexit', process.exitCode, null)
+      /* istanbul ignore next */
+      return ret
+    } else {
+      return originalProcessEmit.apply(this, arguments)
+    }
+  }
+}
+
+
+/***/ }),
+
+/***/ 9728:
+/***/ ((module) => {
+
+// This is not the set of all possible signals.
+//
+// It IS, however, the set of all signals that trigger
+// an exit on either Linux or BSD systems.  Linux is a
+// superset of the signal names supported on BSD, and
+// the unknown signals just fail to register, so we can
+// catch that easily enough.
+//
+// Don't bother with SIGKILL.  It's uncatchable, which
+// means that we can't fire any callbacks anyway.
+//
+// If a user does happen to register a handler on a non-
+// fatal signal like SIGWINCH or something, and then
+// exit, it'll end up firing `process.emit('exit')`, so
+// the handler will be fired anyway.
+//
+// SIGBUS, SIGFPE, SIGSEGV and SIGILL, when not raised
+// artificially, inherently leave the process in a
+// state from which it is not safe to try and enter JS
+// listeners.
+module.exports = [
+  'SIGABRT',
+  'SIGALRM',
+  'SIGHUP',
+  'SIGINT',
+  'SIGTERM'
+]
+
+if (process.platform !== 'win32') {
+  module.exports.push(
+    'SIGVTALRM',
+    'SIGXCPU',
+    'SIGXFSZ',
+    'SIGUSR2',
+    'SIGTRAP',
+    'SIGSYS',
+    'SIGQUIT',
+    'SIGIOT'
+    // should detect profiler and enable/disable accordingly.
+    // see #21
+    // 'SIGPROF'
+  )
+}
+
+if (process.platform === 'linux') {
+  module.exports.push(
+    'SIGIO',
+    'SIGPOLL',
+    'SIGPWR',
+    'SIGSTKFLT',
+    'SIGUNUSED'
+  )
+}
+
+
+/***/ }),
+
 /***/ 9625:
 /***/ ((module, __unused_webpack_exports, __nccwpck_require__) => {
 
@@ -22446,7 +24710,7 @@ Object.defineProperty(exports, "markdownSummary", ({ enumerable: true, get: func
 /**
  * Path exports
  */
-var path_utils_1 = __nccwpck_require__(2981);
+var path_utils_1 = __nccwpck_require__(937);
 Object.defineProperty(exports, "toPosixPath", ({ enumerable: true, get: function () { return path_utils_1.toPosixPath; } }));
 Object.defineProperty(exports, "toWin32Path", ({ enumerable: true, get: function () { return path_utils_1.toWin32Path; } }));
 Object.defineProperty(exports, "toPlatformPath", ({ enumerable: true, get: function () { return path_utils_1.toPlatformPath; } }));
@@ -22603,7 +24867,7 @@ exports.OidcClient = OidcClient;
 
 /***/ }),
 
-/***/ 2981:
+/***/ 937:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -28831,6 +31095,14 @@ module.exports = require("assert");
 
 "use strict";
 module.exports = require("child_process");
+
+/***/ }),
+
+/***/ 2057:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("constants");
 
 /***/ }),
 
