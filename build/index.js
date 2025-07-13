@@ -219,7 +219,7 @@ async function installMacTools(installationPath, toolToBeUsed, usecase, outputVa
     outputVar.imp_file_paths["extractPath"] = extractPath;
     let configFilePath = "";
     //pkcs11 library installation
-    if (usecase != "gpg-signing") {
+    if (usecase != "gpg-signing" && extractPath != "") {
         const pkcs11FileName = "smpkcs11.dmg";
         //pkcs11 library installation
         configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
@@ -343,7 +343,7 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
     }
     //function extracts all tools and returns the installed path
     const extractPath = await (0, runWinTools_1.runWinToolBasedInstallationOrExtraction)(toolToBeUsed, directoryPath, usecase);
-    if (usecase == "gpg-signing") {
+    if (usecase == "gpg-signing" && extractPath != "") {
         console.log("GPG signing: path where the stm tools were installed/extracted is ", directoryPath);
     }
     else {
@@ -353,7 +353,7 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
     outputVar.imp_file_paths["extractPath"] = extractPath;
     let configFilePath = "";
     //pkcs11 library installation
-    if (usecase != "gpg-signing") {
+    if (usecase != "gpg-signing" && extractPath != "") {
         const pkcs11FileName = "smpkcs11.dll";
         //Configures the pkcs#11
         configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
@@ -778,53 +778,46 @@ const services_1 = __nccwpck_require__(1174);
 const tl = __importStar(__nccwpck_require__(1092));
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 const utils_1 = __nccwpck_require__(7192);
+const lockfile = __importStar(__nccwpck_require__(2147));
 async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirectoryPath, usecase) {
     let extractPath = tempDirectoryPath;
-    for (let i = 0; i < toolToBeUsed.length; i++) {
-        const downloadFlag = checkInstallerTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
-        if (downloadFlag) {
-            //initiates an API call and writes files to a specified temporary location
-            await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
-        }
-        if (!(0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed[i]))) {
-            if (usecase == "" || usecase == "keypair-signing") {
-                //checking for .msi files
-                if (toolToBeUsed[i].includes(".msi")) {
-                    extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed[i].replace(".msi", ""));
-                    //tool to run .msi file
-                    const msiRunner = tl
-                        .tool("msiexec")
-                        .arg([
-                        `/i`,
-                        `${tempDirectoryPath}\\${toolToBeUsed}`,
-                        "/quiet",
-                        `INSTALLDIR=${extractPath}`,
-                    ]);
-                    const regReturnCode = await msiRunner.exec();
-                    //Please provide admin privileges if the regReturnCode is 1625-30
-                    if (regReturnCode != 0) {
-                        throw new Error(`Installation of msi failed with return code ${regReturnCode}`);
-                    }
-                    console.log("installation of smctl returned code", regReturnCode);
+    try {
+        // Acquire a lock on the tempDirectory
+        await lockfile.lock(tempDirectoryPath, { stale: 5000 });
+        console.log(`Lock acquired for ${tempDirectoryPath}.`);
+        for (let i = 0; i < toolToBeUsed.length; i++) {
+            const downloadFlag = checkInstallerTobeDownloaded(tempDirectoryPath, toolToBeUsed[i]);
+            let clientToolsDownloadPath = "";
+            if (downloadFlag) {
+                //initiates an API call and writes files to a specified temporary location.
+                clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
+                try {
+                    extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i], usecase);
                 }
-                if (!shouldCheckIfToolsInstalled()) {
-                    //tool for locating installations Where the installation is already in place
-                    const installationLocation = tl
-                        .tool("wmic")
-                        .arg([
-                        "product",
-                        "where",
-                        "Vendor='DigiCert Inc.' and name='DigiCert One Signing Manager Tools'",
-                        "get",
-                        "installlocation",
-                        "/format:list",
-                    ])
-                        .execSync();
-                    const { stdout } = installationLocation;
-                    extractPath = stdout.split("=")[1].trim();
+                catch (error) {
+                    if (typeof error === "object" &&
+                        error !== null &&
+                        "code" in error &&
+                        error.code === "ELOCKED") {
+                        console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                        // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
+                        extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i], usecase); // Retry the operation
+                    }
+                    else {
+                        console.error(`Error processing file ${tempDirectoryPath}:`, error);
+                    }
                 }
             }
         }
+    }
+    catch (error) {
+        console.error(`Error processing file ${tempDirectoryPath}:`, error);
+    }
+    finally {
+        // Release lock from the tempDirectory
+        await lockfile.unlock(tempDirectoryPath);
+        console.log(`Lock released for ${tempDirectoryPath}.`);
     }
     return extractPath;
 }
@@ -860,6 +853,68 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     }
     return downloadFlag;
 };
+async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed, usecase) {
+    let extractPath = "";
+    if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
+        try {
+            if (!(0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, toolToBeUsed))) {
+                if (usecase == "" || usecase == "keypair-signing") {
+                    //checking for .msi files
+                    if (toolToBeUsed.includes(".msi")) {
+                        extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
+                        //tool to run .msi file
+                        const msiRunner = tl
+                            .tool("msiexec")
+                            .arg([
+                            `/i`,
+                            `${tempDirectoryPath}\\${toolToBeUsed}`,
+                            "/quiet",
+                            `INSTALLDIR=${extractPath}`,
+                        ]);
+                        const regReturnCode = await msiRunner.exec();
+                        //Please provide admin privileges if the regReturnCode is 1625-30
+                        if (regReturnCode != 0) {
+                            throw new Error(`Installation of msi failed with return code ${regReturnCode}`);
+                        }
+                        console.log("installation of smctl returned code", regReturnCode);
+                    }
+                    if (!shouldCheckIfToolsInstalled()) {
+                        //tool for locating installations Where the installation is already in place
+                        const installationLocation = tl
+                            .tool("wmic")
+                            .arg([
+                            "product",
+                            "where",
+                            "Vendor='DigiCert Inc.' and name='DigiCert One Signing Manager Tools'",
+                            "get",
+                            "installlocation",
+                            "/format:list",
+                        ])
+                            .execSync();
+                        const { stdout } = installationLocation;
+                        extractPath = stdout.split("=")[1].trim();
+                    }
+                }
+            }
+        }
+        catch (error) {
+            if (typeof error === "object" &&
+                error !== null &&
+                "code" in error &&
+                error.code === "ELOCKED") {
+                console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
+                // Implement a retry mechanism (e.g., using setTimeout or a retry library)
+                await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+                // Retry the operation
+                await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed, usecase);
+            }
+            else {
+                console.error(`Error processing file ${tempDirectoryPath}:`, error);
+            }
+        }
+    }
+    return extractPath;
+}
 module.exports = { runWinToolBasedInstallationOrExtraction, getAPICall: services_1.getAPICall };
 
 
