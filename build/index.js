@@ -59,8 +59,8 @@ const utils_1 = __nccwpck_require__(7192);
 async function main(usecase = "") {
     console.log("usecase called for installation is ", usecase);
     const outputVar = { ret_code: 1, imp_file_paths: {} };
-    const forceDownloadTools = "true";
-    //const forceDownloadTools = process.env.FORCE_DOWNLOAD_TOOLS;
+    //const forceDownloadTools = "true";
+    const forceDownloadTools = process.env.FORCE_DOWNLOAD_TOOLS;
     console.log(`The input value of forceDownloadTools is: ${forceDownloadTools}`);
     tl.setVariable(utils_1.appConst.VAR_FORCE_DOWNLOAD_TOOLS, forceDownloadTools, false, true);
     try {

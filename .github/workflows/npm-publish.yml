@@ -37,4 +37,5 @@ jobs:
 
     env:
       SSM_CLIENT_INSTALLER_READ_TOKEN: ${{ secrets.SSM_CLIENT_INSTALLER_READ_TOKEN }}
+      FORCE_DOWNLOAD_TOOLS: true
 
