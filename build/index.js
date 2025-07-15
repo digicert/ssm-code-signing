@@ -812,6 +812,9 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                     }
                 }
             }
+            else {
+                extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed[i].replace(".msi", ""));
+            }
         }
     }
     catch (error) {
