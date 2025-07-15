@@ -913,12 +913,15 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 // Implement a retry mechanism (e.g., using setTimeout or a retry library)
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
                 // Retry the operation
-                await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
+                extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
             }
             else {
                 console.error(`Error processing file ${tempDirectoryPath}:`, error);
             }
         }
+    }
+    else {
+        extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
     }
     return extractPath;
 }
@@ -1441,11 +1444,6 @@ const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
             }
             else {
                 console.log(`The installed tools hash doesn't match with the downloaded file's hash,\n`, `Continuing with the tool installation / extraction`);
-                /*writeFileWithContent(
-                  path.join(getTempDirectoryPath, appConst.HASH_FILE_NAME),
-                  toolDownloaded[toolToBeUsed],
-                  `${toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`
-                );*/
                 forceInstallTool = "true";
                 tl.setVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL, forceInstallTool, false, true);
             }
