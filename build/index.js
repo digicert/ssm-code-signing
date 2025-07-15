@@ -406,7 +406,7 @@ const services_1 = __nccwpck_require__(1174);
 const utils_1 = __nccwpck_require__(7192);
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirectoryPath, usecase) {
-    const extractPath = tempDirectoryPath;
+    let extractPath = tempDirectoryPath;
     try {
         // Acquire a lock on the tempDirectory
         await lockfile.lock(tempDirectoryPath, { stale: 5000 });
@@ -418,7 +418,7 @@ async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 //initiates an API call and writes files to a specified temporary location.
                 clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
                 try {
-                    await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
+                    extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
                 }
                 catch (error) {
                     if (typeof error === "object" &&
@@ -428,7 +428,7 @@ async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                         console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
                         // Implement a retry mechanism (e.g., using setTimeout or a retry library)
                         await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
-                        await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
+                        extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
                     }
                     else {
                         console.error(`Error processing file ${tempDirectoryPath}:`, error);
@@ -475,6 +475,7 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     return downloadFlag;
 };
 async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
+    let extractPath = clientToolsDownloadPath;
     if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
         try {
             if (utils_1.toolDownloaded[toolToBeUsed].includes(".zip")) {
@@ -502,8 +503,8 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 }
                 const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
                 (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
-                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
-                console.log("zip extraction completed, path is ", clientToolsDownloadPath);
+                extractPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
+                console.log("zip extraction completed, path is ", extractPath);
             }
         }
         catch (error) {
@@ -515,13 +516,14 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 // Implement a retry mechanism (e.g., using setTimeout or a retry library)
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
                 // Retry the operation
-                await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
+                extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed);
             }
             else {
                 console.error(`Error processing file ${tempDirectoryPath}:`, error);
             }
         }
     }
+    return extractPath;
 }
 module.exports = { runLnxToolBasedInstallationOrExtraction };
 
