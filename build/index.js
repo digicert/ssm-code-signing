@@ -576,7 +576,7 @@ const services_1 = __nccwpck_require__(1174);
 const utils_1 = __nccwpck_require__(7192);
 const fileSystemUtils_1 = __nccwpck_require__(2042);
 async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirectoryPath, usecase) {
-    let extractPath = tempDirectoryPath;
+    const extractPath = tempDirectoryPath;
     try {
         // Acquire a lock on the tempDirectory
         await lockfile.lock(tempDirectoryPath, { stale: 5000 });
@@ -588,7 +588,7 @@ async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 //initiates an API call and writes files to a specified temporary location.
                 clientToolsDownloadPath = await (0, services_1.callApi)(toolToBeUsed[i], tempDirectoryPath);
                 try {
-                    extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
+                    await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]);
                 }
                 catch (error) {
                     if (typeof error === "object" &&
@@ -598,7 +598,7 @@ async function runMacToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                         console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
                         // Implement a retry mechanism (e.g., using setTimeout or a retry library)
                         await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
-                        extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
+                        processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
                     }
                     else {
                         console.error(`Error processing file ${tempDirectoryPath}:`, error);
