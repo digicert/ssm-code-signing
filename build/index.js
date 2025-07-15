@@ -435,6 +435,9 @@ async function runLnxToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                     }
                 }
             }
+            else {
+                extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed[i].replace(".zip", ""));
+            }
         }
     }
     catch (error) {
@@ -522,6 +525,9 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 console.error(`Error processing file ${tempDirectoryPath}:`, error);
             }
         }
+    }
+    else {
+        extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".zip", ""));
     }
     return extractPath;
 }
