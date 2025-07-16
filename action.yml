@@ -1,18 +1,17 @@
 ---
 name: "Code signing with Software Trust Manager"
 description: "Code signing automation with private key protection and multi-factor authentication (MFA)"
+author: "DigiCert"
 
 inputs:
-  forceDownloadTools:
-    description: "Parameter to force download of the tools"
-    type: boolean
-    required: true
-    default: false
+  force-download-tools:
+    description: "Parameter to force download the signing tools"
+    default: "false"
 
 runs:
   using: "node20"
   main: "./build/index.js"
-  #post: "./build/cleanup/index.js"
+  
 branding:
   icon: "check-circle"
   color: "blue"
