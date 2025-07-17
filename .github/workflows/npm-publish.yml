@@ -25,6 +25,7 @@ jobs:
         id: STMClientToolsSetup
         run: |
           npm ci
+          npm i --save-dev @types/proper-lockfile
           npm run build
           npm  start
 
