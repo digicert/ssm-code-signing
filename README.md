@@ -79,7 +79,7 @@ This is a list of popular signing tools supported by Software Trust Manager. Thi
 ## Documentation & Guides
 
 For comprehensive documentation, refer to: 
-[GitHub custom action for keypair signing](https://docs.digicert.com/en/digicert-one/software-trust-manager/ci-cd-integrations/plugins/github-custom-action-for-keypair-signing.html)
+[GitHub custom action for keypair signing](https://docs.digicert.com/en/software-trust-manager/ci-cd-integrations-and-deployment-pipelines/plugins/github/install-client-tools-for-standard-keypair-signing-on-github.html)
 
 ## Feedback and issues
 [Contact DigiCert](https://www.digicert.com/contact-us)
