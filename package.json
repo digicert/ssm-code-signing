@@ -30,6 +30,7 @@
     "azure-pipelines-task-lib": "^5.2.0"
   },
   "devDependencies": {
+    "@types/proper-lockfile": "^4.1.4",
     "@vercel/ncc": "^0.34.0",
     "babel-loader": "^9.1.0",
     "concurrently": "^9.2.0",
