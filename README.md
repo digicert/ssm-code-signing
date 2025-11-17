@@ -2,12 +2,17 @@
 
 ## New GitHub Actions / Deprecation Notice
 
-DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Action will be deprecated.
+DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Actions (**Code signing with Software Trust Manager**) will be deprecated.
+
+End-of-service will take place on February 1, 2026.
+
+End-of-life will take place on February 28, 2026.
+
 - To learn more about the new GitHub Actions, see [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing).
 - To learn how to migrate your existing configurations, see the **Migrate to new GitHub Actions** section below.
 
 ### Migrate to new GitHub Actions
-With the introduction of [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing), DigiCert will be deprecating this GitHub Actions.
+With the introduction of [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing), DigiCert will be deprecating this GitHub Actions (**Code signing with Software Trust Manager**).
 
 To avoid any disruptions, please migrate from the old GitHub Actions to the new GitHub Actions. 
 
