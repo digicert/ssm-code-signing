@@ -1,6 +1,6 @@
 # Code signing with Software Trust Manager
 
-## New GitHub Actions / Deprecation Notice
+## New GitHub Actions / Deprecation notice
 
 DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Actions (**Code signing with Software Trust Manager**) will be deprecated.
 
