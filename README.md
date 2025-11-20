@@ -1,5 +1,41 @@
 # Code signing with Software Trust Manager
 
+## New GitHub Actions / Deprecation notice
+
+DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Actions (**Code signing with Software Trust Manager**) will be deprecated.
+
+End-of-service will take place on February 1, 2026.
+
+End-of-life will take place on February 28, 2026.
+
+- To learn more about the new GitHub Actions, see [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing).
+- To learn how to migrate your existing configurations, see the **Migrate to new GitHub Actions** section below.
+
+### Migrate to new GitHub Actions
+With the introduction of [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing), DigiCert will be deprecating this GitHub Actions (**Code signing with Software Trust Manager**).
+
+To avoid any disruptions, please migrate from the old GitHub Actions to the new GitHub Actions. 
+
+To migrate, replace the following **uses** line in your existing repo. 
+
+Replace <code>digicert/ssm-code-signing@v1.1.1</code> with <code>digicert/code-signing-software-trust-action@v1.0.0@v1.0.0</code>.  
+
+Review the following snippet:
+
+<pre>
+- name: Setup Software Trust Manager (old)
+  id: stm-setup
+  uses: digicert/ssm-code-signing@v1.1.1 # latest version
+
+- name: Setup Software Trust Manager (new)
+  id: stm-setup
+  uses: digicert/code-signing-software-trust-action@v1.0.0 # latest released version
+</pre>
+
+
+
+## Overview
+
 Code Signing with Software Trust Manager GitHub action is a streamlined keypair-based signing workflow that improves software security and seamlessly integrates with DevOps processes to sign binaries on **Windows** and **Linux**.
 
 This GitHub action automates the installation and configuration of Software Trust Manager client tools, enabling developers to quickly become signing-ready for GitHub action workflows.
