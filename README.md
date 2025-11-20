@@ -23,7 +23,7 @@ Replace <code>digicert/ssm-code-signing@v1.1.1</code> with <code>digicert/code-s
 Review the following snippet:
 
 <pre>
-  - name: Setup Software Trust Manager (old)
+- name: Setup Software Trust Manager (old)
   id: stm-setup
   uses: digicert/ssm-code-signing@v1.1.1 # latest version
 
