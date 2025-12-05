@@ -18,7 +18,7 @@ To avoid any disruptions, please migrate from the old GitHub Actions to the new 
 
 To migrate, replace the following **uses** line in your existing repo. 
 
-Replace <code>digicert/ssm-code-signing@v1.1.1</code> with <code>digicert/code-signing-software-trust-action@v1.0.0@v1.0.0</code>.  
+Replace <code>digicert/ssm-code-signing@v1.1.1</code> with <code>digicert/code-signing-software-trust-action@v1.0.0</code>.  
 
 Review the following snippet:
 
