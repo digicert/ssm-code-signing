@@ -4471,8 +4471,8 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
-            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, (0, utils_1.getLocalFileName)(toolToBeUsed)))) {
+            console.log(`The ${(0, utils_1.getLocalFileName)(toolToBeUsed)} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
                 console.log(`Skipping download for ${toolToBeUsed} as it already exists.`);
@@ -4494,7 +4494,8 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
     let extractPath = clientToolsDownloadPath;
     if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
         try {
-            if (utils_1.toolDownloaded[toolToBeUsed].includes(".zip")) {
+            const localFileName = (0, utils_1.getLocalFileName)(toolToBeUsed);
+            if (localFileName.includes(".zip")) {
                 console.log("The tool is in a zip file trying to extract it : ", clientToolsDownloadPath);
                 //extracts tool.zip
                 const unzipSmctl = tl
@@ -4518,8 +4519,8 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                     console.error("zip extraction failed for ", toolToBeUsed);
                 }
                 const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
-                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
-                extractPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
+                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), localFileName, `${localFileName}=${downloadToolHash}\r\n`);
+                extractPath = path_1.default.join(tempDirectoryPath, localFileName.replace(".zip", ""));
                 console.log("zip extraction completed, path is ", extractPath);
             }
         }
@@ -4638,8 +4639,8 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
-            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, (0, utils_1.getLocalFileName)(toolToBeUsed)))) {
+            console.log(`The ${(0, utils_1.getLocalFileName)(toolToBeUsed)} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
                 console.log(`Skipping download for ${toolToBeUsed} as it already exists.`);
@@ -4651,7 +4652,7 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
             }
         }
         else {
-            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
+            console.log(`The ${(0, utils_1.getLocalFileName)(toolToBeUsed)} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
             downloadFlag = true;
         }
     }
@@ -4663,10 +4664,11 @@ const checkToolsTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
 };
 async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
     const extractPath = clientToolsDownloadPath;
+    const localFileName = (0, utils_1.getLocalFileName)(toolToBeUsed);
     if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
         try {
             //checking for .msi files or .dmg files
-            if (utils_1.toolDownloaded[toolToBeUsed].includes(".zip")) {
+            if (localFileName.includes(".zip")) {
                 console.log("The tool is in a zip file trying to extract it : ", clientToolsDownloadPath);
                 //extracts tool.zip
                 const unzipSmctl = tl
@@ -4683,11 +4685,11 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                     console.error("zip extraction failed for ", toolToBeUsed);
                 }
                 const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
-                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
-                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed].replace(".zip", ""));
+                (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), (0, utils_1.getLocalFileName)(toolToBeUsed), `${(0, utils_1.getLocalFileName)(toolToBeUsed)}=${downloadToolHash}\r\n`);
+                clientToolsDownloadPath = path_1.default.join(tempDirectoryPath, (0, utils_1.getLocalFileName)(toolToBeUsed).replace(".zip", ""));
                 console.log("zip extraction completed, path is ", clientToolsDownloadPath);
             }
-            else if (utils_1.toolDownloaded[toolToBeUsed].includes(".dmg")) {
+            else if ((0, utils_1.getLocalFileName)(toolToBeUsed).includes(".dmg")) {
                 // making the smctl executable file
                 // Unique mount point name to avoid conflicts
                 const toolExec = utils_1.appConst.TOOL_EXECUTABLES[utils_1.toolDownloaded[toolToBeUsed]];
@@ -4697,12 +4699,12 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 const attachDmg = tl
                     .tool("hdiutil")
                     .arg("attach")
-                    .arg(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))
+                    .arg(path_1.default.join(tempDirectoryPath, (0, utils_1.getLocalFileName)(toolToBeUsed)))
                     .arg("-mountpoint")
                     .arg(uniqueVolumeName);
                 const attachRetCode = await attachDmg.exec();
                 if (attachRetCode == 0) {
-                    console.log(`${utils_1.toolDownloaded[toolToBeUsed]} attached successfully`);
+                    console.log(`${(0, utils_1.getLocalFileName)(toolToBeUsed)} attached successfully`);
                     const copyExec = tl
                         .tool("cp")
                         .arg("-R")
@@ -4710,7 +4712,7 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                         .arg(path_1.default.join(tempDirectoryPath, toolExec));
                     const copyExecRetCode = await copyExec.exec();
                     if (copyExecRetCode == 0) {
-                        console.log(`${utils_1.toolDownloaded[toolToBeUsed]} executable copied successfully`);
+                        console.log(`${(0, utils_1.getLocalFileName)(toolToBeUsed)} executable copied successfully`);
                         console.log("Detaching the dmg file");
                         const detachDmg = tl
                             .tool("hdiutil")
@@ -4718,10 +4720,10 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                             .arg(uniqueVolumeName);
                         const detachRetCode = await detachDmg.exec();
                         if (detachRetCode == 0) {
-                            console.log(`${utils_1.toolDownloaded[toolToBeUsed]} detached successfully ${detachRetCode}`);
+                            console.log(`${(0, utils_1.getLocalFileName)(toolToBeUsed)} detached successfully ${detachRetCode}`);
                         }
                         else {
-                            console.error(`Failed to detach ${utils_1.toolDownloaded[toolToBeUsed]} : ${detachRetCode}`);
+                            console.error(`Failed to detach ${(0, utils_1.getLocalFileName)(toolToBeUsed)} : ${detachRetCode}`);
                         }
                         const setExecutableFlagForTool = tl
                             .tool("chmod")
@@ -4730,7 +4732,7 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                         const syncRetCode = await setExecutableFlagForTool.exec();
                         console.log(`Set executable flag for ${toolExec} : ${syncRetCode}`);
                         const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
-                        (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
+                        (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), (0, utils_1.getLocalFileName)(toolToBeUsed), `${(0, utils_1.getLocalFileName)(toolToBeUsed)}=${downloadToolHash}\r\n`);
                         console.log("zip extraction completed, path is ", extractPath);
                     }
                     else {
@@ -4738,7 +4740,7 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                     }
                 }
                 else {
-                    console.error(`Failed to attach ${utils_1.toolDownloaded[toolToBeUsed]}: ${attachRetCode}`);
+                    console.error(`Failed to attach ${(0, utils_1.getLocalFileName)(toolToBeUsed)}: ${attachRetCode}`);
                 }
             }
         }
@@ -4862,8 +4864,8 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     if (tl.getVariable(utils_1.appConst.VAR_IS_INSTALLATION_DIR_EXISTS) == "true") {
         console.log(`The installation directory already exists at : ${tempDirectoryPath}`);
         // If the directory exists, check whether it contains the required tools
-        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]))) {
-            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
+        if ((0, fileSystemUtils_1.isFileExistSync)(path_1.default.join(tempDirectoryPath, (0, utils_1.getLocalFileName)(toolToBeUsed)))) {
+            console.log(`The ${(0, utils_1.getLocalFileName)(toolToBeUsed)} tool already exists at : `, path_1.default.join(tempDirectoryPath, toolToBeUsed));
             // If the msi installer file exists, and forceDownloadTools is set to false, skip the download
             if (!forceDownloadTools) {
                 console.log(`Skipping download for ${toolToBeUsed} as it already exists.`);
@@ -4875,7 +4877,7 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
             }
         }
         else {
-            console.log(`The ${utils_1.toolDownloaded[toolToBeUsed]} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
+            console.log(`The ${(0, utils_1.getLocalFileName)(toolToBeUsed)} tool doesn't exists at : ${tempDirectoryPath}\n`, `Hence tool to be downloaded`);
             downloadFlag = true;
         }
     }
@@ -4927,7 +4929,7 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 extractPath = stdout.split("=")[1].trim();
             }
             const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
-            (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), utils_1.toolDownloaded[toolToBeUsed], `${utils_1.toolDownloaded[toolToBeUsed]}=${downloadToolHash}\r\n`);
+            (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), (0, utils_1.getLocalFileName)(toolToBeUsed), `${(0, utils_1.getLocalFileName)(toolToBeUsed)}=${downloadToolHash}\r\n`);
         }
         catch (error) {
             if (typeof error === "object" &&
@@ -5290,9 +5292,9 @@ const fileSystemUtils_1 = __nccwpck_require__(7755);
 const utils_1 = __nccwpck_require__(2160);
 const CustomChunkReadable_1 = __nccwpck_require__(3812);
 const getHost = () => {
-    return "https://one.digicert.com";
+    return "https://pki-downloads.digicert.com";
 };
-exports.uiAPIPrefix = "signingmanager/api-ui/v1";
+exports.uiAPIPrefix = "";
 //Usage: processFileResponse(Buffer.from(response.data), 128 * 1024, fileStream);
 async function processFileResponse(responseBuffer, customChunkSize, fileWriteStream) {
     const readableStream = new CustomChunkReadable_1.CustomChunkReadable(responseBuffer, customChunkSize);
@@ -5441,10 +5443,13 @@ const getStaticConfigFilePath = async (pkcs11FileName, extractPath) => {
 };
 exports.getStaticConfigFilePath = getStaticConfigFilePath;
 const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
-    const urlToDownloadTool = `${exports.uiAPIPrefix}/releases/noauth/${toolToBeUsed}/download`;
-    console.log(`Tool to be downloaded and used ${toolToBeUsed} and url is ${urlToDownloadTool}`);
-    // Form a complete download path
-    const clientToolsDownloadPath = path_1.default.join(getTempDirectoryPath, utils_1.toolDownloaded[toolToBeUsed]);
+    // Get CDN filename and local filename using helper functions
+    const cdnFileName = (0, utils_1.getCdnFileName)(toolToBeUsed);
+    const localFileName = (0, utils_1.getLocalFileName)(toolToBeUsed);
+    const urlToDownloadTool = `/stm/latest/${cdnFileName}`;
+    console.log(`Tool to be downloaded and used ${toolToBeUsed}, CDN file: ${cdnFileName}, local file: ${localFileName}, URL: ${urlToDownloadTool}`);
+    // Form a complete download path using the local filename
+    const clientToolsDownloadPath = path_1.default.join(getTempDirectoryPath, localFileName);
     console.log(`Tool download file path ${clientToolsDownloadPath}`);
     // Read file from the API and write into a local file
     const isFileWritten = await (0, exports.readFileApiCall)(urlToDownloadTool, clientToolsDownloadPath);
@@ -5459,9 +5464,10 @@ const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
         if ((0, fileSystemUtils_1.isFileExistSync)(hashFilePath) && (0, fileSystemUtils_1.isFileNotEmptySync)(hashFilePath)) {
             const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
             const toolHashMap = (0, fileSystemUtils_1.parseHashFile)((0, fileSystemUtils_1.readFileSync)(hashFilePath, utils_1.appConst.HASH_FILE_NAME).toString());
-            console.log(`${toolToBeUsed} Hash = `, toolHashMap[utils_1.toolDownloaded[toolToBeUsed]]);
+            const localFileName = (0, utils_1.getLocalFileName)(toolToBeUsed);
+            console.log(`${toolToBeUsed} Hash = `, toolHashMap[localFileName]);
             console.log(`Downloaded file Hash = `, downloadToolHash);
-            if (toolHashMap[utils_1.toolDownloaded[toolToBeUsed]] === downloadToolHash) {
+            if (toolHashMap[localFileName] === downloadToolHash) {
                 console.log(`The installed tool's hash matches with the downloaded file's hash,\n`, `Skipping the tool installation / extraction`);
                 forceInstallTool = "false";
                 tl.setVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL, forceInstallTool, false, true);
@@ -5501,7 +5507,7 @@ module.exports = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toolDownloaded = exports.OSToToolMapper = exports.OSToToolMappergpg = exports.OSTypeMapper = exports.appConst = void 0;
+exports.getCdnFileName = exports.getLocalFileName = exports.toolDownloaded = exports.OSToToolMapper = exports.OSToToolMappergpg = exports.OSTypeMapper = exports.appConst = void 0;
 const azure_pipelines_task_lib_1 = __nccwpck_require__(8908);
 exports.appConst = {
     SSM_WORK_DIRECTORY: "dcssm",
@@ -5558,6 +5564,8 @@ exports.OSToToolMapper = {
     win32: ["smtools-windows-x64.msi"],
     darwin: ["smctk-apple-any", "smctl-mac-x64", "smpkcs11-mac-x64"],
 };
+// Map of tool identifiers to their filenames
+// For tools where CDN filename differs from local filename, use object with cdnFile and localFile
 exports.toolDownloaded = {
     "ssm-scd-windows-x64": "ssm-scd.exe",
     "smpkcs11-windows-x64": "smpkcs11.dll",
@@ -5569,17 +5577,31 @@ exports.toolDownloaded = {
     "smpkcs11-linux-x64": "smpkcs11.dll",
     "smctl-linux-x64": "smctl",
     "ssm-scd-linux-x64": "ssm-scd",
-    "smctk-apple-any": "smtools-mac-x64.zip",
-    "smctl-mac-x64": "smctl.dmg",
-    "smpkcs11-mac-x64": "smpkcs11.dmg",
-    "ssm-scd-mac-x64": "ssm-scd.dmg",
+    "smctk-apple-any": { cdnFile: "DigiCert SSM Signing Clients.zip", localFile: "smtools-mac-x64.zip" },
+    "smctl-mac-x64": { cdnFile: "smctl-mac-x64.dmg", localFile: "smctl.dmg" },
+    "smpkcs11-mac-x64": { cdnFile: "smpkcs11.dylib.dmg", localFile: "smpkcs11.dmg" },
+    "ssm-scd-mac-x64": { cdnFile: "ssm-scd-x64.dmg", localFile: "ssm-scd.dmg" },
 };
+// Helper function to get the local filename for a tool
+const getLocalFileName = (toolToBeUsed) => {
+    const toolInfo = exports.toolDownloaded[toolToBeUsed];
+    return typeof toolInfo === 'string' ? toolInfo : toolInfo.localFile;
+};
+exports.getLocalFileName = getLocalFileName;
+// Helper function to get the CDN filename for a tool
+const getCdnFileName = (toolToBeUsed) => {
+    const toolInfo = exports.toolDownloaded[toolToBeUsed];
+    return typeof toolInfo === 'string' ? toolInfo : toolInfo.cdnFile;
+};
+exports.getCdnFileName = getCdnFileName;
 module.exports = {
     appConst: exports.appConst,
     OSTypeMapper: exports.OSTypeMapper,
     OSToToolMapper: exports.OSToToolMapper,
     OSToToolMappergpg: exports.OSToToolMappergpg,
     toolDownloaded: exports.toolDownloaded,
+    getLocalFileName: exports.getLocalFileName,
+    getCdnFileName: exports.getCdnFileName,
 };
 
 
@@ -14675,6 +14697,7 @@ var https = __nccwpck_require__(5687);
 var parseUrl = (__nccwpck_require__(7310).parse);
 var fs = __nccwpck_require__(7147);
 var Stream = (__nccwpck_require__(2781).Stream);
+var crypto = __nccwpck_require__(6113);
 var mime = __nccwpck_require__(3583);
 var asynckit = __nccwpck_require__(4812);
 var setToStringTag = __nccwpck_require__(1770);
@@ -15012,12 +15035,7 @@ FormData.prototype._generateBoundary = function () {
   // This generates a 50 character boundary similar to those used by Firefox.
 
   // They are optimized for boyer-moore parsing.
-  var boundary = '--------------------------';
-  for (var i = 0; i < 24; i++) {
-    boundary += Math.floor(Math.random() * 10).toString(16);
-  }
-
-  this._boundary = boundary;
+  this._boundary = '--------------------------' + crypto.randomBytes(12).toString('hex');
 };
 
 // Note: getLengthSync DOESN'T calculate streams length
@@ -15135,7 +15153,7 @@ FormData.prototype.submit = function (params, cb) {
         request.removeListener('error', callback);
         request.removeListener('response', onResponse);
 
-        return cb.call(this, error, responce); // eslint-disable-line no-invalid-this
+        return cb.call(this, error, responce);
       };
 
       onResponse = callback.bind(this, null);
@@ -15159,7 +15177,7 @@ FormData.prototype._error = function (err) {
 FormData.prototype.toString = function () {
   return '[object FormData]';
 };
-setToStringTag(FormData, 'FormData');
+setToStringTag(FormData.prototype, 'FormData');
 
 // Public API
 module.exports = FormData;
