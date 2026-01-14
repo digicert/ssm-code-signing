@@ -4780,16 +4780,10 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
             else if ((0, utils_1.getLocalFileName)(toolToBeUsed).includes(".dmg")) {
                 // making the smctl executable file
                 // Unique mount point name to avoid conflicts
-                console.log(`[DEBUG] toolToBeUsed: ${toolToBeUsed}`);
-                console.log(`[DEBUG] toolDownloaded[toolToBeUsed]:`, utils_1.toolDownloaded[toolToBeUsed]);
-                console.log(`[DEBUG] getLocalFileName(toolToBeUsed): ${(0, utils_1.getLocalFileName)(toolToBeUsed)}`);
                 const toolExec = utils_1.appConst.TOOL_EXECUTABLES[(0, utils_1.getLocalFileName)(toolToBeUsed)];
-                console.log(`[DEBUG] toolExec: ${toolExec}`);
-                console.log(`[DEBUG] TOOL_EXECUTABLES:`, utils_1.appConst.TOOL_EXECUTABLES);
                 const uniqueVolumeName = utils_1.appConst.MOUNT_VOL_NAMES[(0, utils_1.getLocalFileName)(toolToBeUsed)] +
                     "-" +
                     Math.random().toString(36).substring(2, 15);
-                console.log(`[DEBUG] uniqueVolumeName: ${uniqueVolumeName}`);
                 const attachDmg = tl
                     .tool("hdiutil")
                     .arg("attach")
@@ -4804,8 +4798,6 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                         .arg("-R")
                         .arg(path_1.default.join(uniqueVolumeName, utils_1.appConst.MOUNT_VOL_PATHS[(0, utils_1.getLocalFileName)(toolToBeUsed)]))
                         .arg(path_1.default.join(tempDirectoryPath, toolExec));
-                    console.log(`[DEBUG] Copy source path: ${path_1.default.join(uniqueVolumeName, utils_1.appConst.MOUNT_VOL_PATHS[(0, utils_1.getLocalFileName)(toolToBeUsed)])}`);
-                    console.log(`[DEBUG] Copy dest path: ${path_1.default.join(tempDirectoryPath, toolExec)}`);
                     const copyExecRetCode = await copyExec.exec();
                     if (copyExecRetCode == 0) {
                         console.log(`${(0, utils_1.getLocalFileName)(toolToBeUsed)} executable copied successfully`);
