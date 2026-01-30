@@ -2,23 +2,27 @@
 
 ## New GitHub Actions / Deprecation notice
 
-DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Actions (**Code signing with Software Trust Manager**) will be deprecated.
+DigiCert has released a new and improved, separate iteration of its code signing GitHub Actions called [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing). As a result, this GitHub Actions (**Code signing with Software Trust Manager**) is scheduled for deprecation:
 
-End-of-service will take place on February 1, 2026.
+| Milestone | Date |
+|---------|------|
+| End of service | March 1, 2026 |
+| End of life | May 1, 2026 |
 
-End-of-life will take place on February 28, 2026.
+After the end of service date, this GitHub Action will no longer receive updates or fixes. After the end of life date, it will be removed from GitHub Actions.
 
-- To learn more about the new GitHub Actions, see [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing).
-- To learn how to migrate your existing configurations, see the **Migrate to new GitHub Actions** section below.
+**Recommendation:** 
+- New users should use DigiCert Binary Signing. 
+- Existing users should migrate to DigiCert Binary Signing.
 
-### Migrate to new GitHub Actions
-With the introduction of [DigiCert Binary Signing](https://github.com/marketplace/actions/digicert-binary-signing), DigiCert will be deprecating this GitHub Actions (**Code signing with Software Trust Manager**).
+### Migrate to DigiCert Binary Signing
 
-To avoid any disruptions, please migrate from the old GitHub Actions to the new GitHub Actions. 
+To avoid any disruptions, migrate from this legacy GitHub Actions to **DigiCert Binary Signing**. 
 
-To migrate, replace the following **uses** line in your existing repo. 
+To migrate, update your workflow by replacing the </code>uses</code> value in your repository. 
 
-Replace <code>digicert/ssm-code-signing@v1.1.1</code> with <code>digicert/code-signing-software-trust-action@v1.0.0</code>.  
+Replace: <code>digicert/ssm-code-signing@v1.1.1</code> 
+With: <code>digicert/code-signing-software-trust-action@v1.0.0</code>.  
 
 Review the following snippet:
 
