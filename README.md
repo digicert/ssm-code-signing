@@ -4,7 +4,7 @@
 
 DigiCert has released a new, separate iteration of its code signing GitHub Actions. As a result, this GitHub Actions (**Code signing with Software Trust Manager**) will be deprecated.
 
-End-of-service will take place on Mar 1, 2026.
+End-of-service will take place on March 1, 2026.
 
 End-of-life will take place on May 1, 2026.
 
