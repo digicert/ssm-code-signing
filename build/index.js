@@ -4844,7 +4844,9 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                 }
             }
             else {
-                extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed[i].replace(".msi", ""));
+                // Download was skipped because MSI file already exists.
+                console.log("MSI file already exists, looking for existing installation location...");
+                extractPath = await findExistingInstallationPath(tempDirectoryPath, toolToBeUsed[i]);
             }
         }
     }
@@ -4921,6 +4923,51 @@ async function findInstallationPath(tempDirectoryPath, toolToBeUsed) {
     console.error("Could not find installation in any common paths");
     console.log("Searched paths:", commonPaths.filter(p => p));
     throw new Error("MSI installed successfully but could not locate installation directory. Please check Windows Programs list for 'DigiCert One Signing Manager Tools'.");
+}
+// Find existing installation path by querying wmic first, then falling back to common paths
+async function findExistingInstallationPath(tempDirectoryPath, toolToBeUsed) {
+    let extractPath = "";
+    // First try wmic to get actual install location
+    try {
+        console.log("Querying installation location using wmic...");
+        const installationLocation = tl
+            .tool("wmic")
+            .arg([
+            "product",
+            "where",
+            "Vendor='DigiCert Inc.' and name='DigiCert One Signing Manager Tools'",
+            "get",
+            "installlocation",
+            "/format:list",
+        ])
+            .execSync();
+        const { stdout } = installationLocation;
+        if (stdout && stdout.includes("=")) {
+            extractPath = stdout.split("=")[1].trim();
+            if (extractPath && (0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+                console.log(`Found existing installation at: ${extractPath}`);
+                return extractPath;
+            }
+        }
+        console.log("wmic did not return a valid installation path");
+    }
+    catch (wmicError) {
+        console.warn("Failed to query installation location with wmic:", wmicError);
+    }
+    // Fallback to common paths
+    try {
+        extractPath = await findInstallationPath(tempDirectoryPath, toolToBeUsed);
+        return extractPath;
+    }
+    catch (fallbackError) {
+        // Last resort: use the old conventional path
+        extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
+        if ((0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+            console.log(`Found installation at conventional path: ${extractPath}`);
+            return extractPath;
+        }
+        throw new Error(`Could not locate DigiCert tools installation. The tool may need to be installed first. Set force-download-tools to true to force reinstallation.`);
+    }
 }
 async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
     let extractPath = "";
@@ -5050,7 +5097,9 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
         }
     }
     else {
-        extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
+        // forceInstallTool is not set - find the existing installation
+        console.log("No force install requested, looking for existing installation...");
+        extractPath = await findExistingInstallationPath(tempDirectoryPath, toolToBeUsed);
     }
     return extractPath;
 }
