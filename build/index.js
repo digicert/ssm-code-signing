@@ -4368,6 +4368,11 @@ async function installWindowsTools(installationPath, toolToBeUsed, usecase, outp
     //pkcs11 library installation
     if (usecase != "gpg-signing" && extractPath != "") {
         const pkcs11FileName = "smpkcs11.dll";
+        // Validate that the extract path exists before attempting to create config files
+        if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+            console.error(`Cannot create config file: installation directory does not exist at ${extractPath}`);
+            throw new Error(`Installation failed: directory not found at ${extractPath}. MSI installation may have failed.`);
+        }
         //Configures the pkcs#11
         configFilePath = await (0, services_1.getConfigFilePath)(pkcs11FileName, extractPath);
     }
@@ -4896,6 +4901,16 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
             if (toolToBeUsed.includes(".msi")) {
                 console.log(`Force installing the tool : ${toolToBeUsed}`);
                 extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
+                // Create the installation directory before running msiexec
+                // MSI may require the directory to exist beforehand
+                if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+                    console.log(`Creating installation directory: ${extractPath}`);
+                    const { generateDirectory } = __nccwpck_require__(7755);
+                    const result = generateDirectory(extractPath, "MSI Installation");
+                    if (result === "false") {
+                        throw new Error(`Failed to create installation directory at ${extractPath}`);
+                    }
+                }
                 //tool to run .msi file
                 const msiRunner = tl
                     .tool("msiexec")
@@ -4908,9 +4923,16 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
                 const regReturnCode = await msiRunner.exec();
                 //Please provide admin privileges if the regReturnCode is 1625-30
                 if (regReturnCode != 0) {
+                    console.error(`MSI installation failed with exit code ${regReturnCode}.`);
+                    console.error(`Common causes: insufficient permissions, conflicting installations, or unsupported INSTALLDIR parameter.`);
                     throw new Error(`Installation of msi failed with return code ${regReturnCode}`);
                 }
                 console.log("installation of smctl returned code", regReturnCode);
+                // Verify the installation directory exists and has content after MSI installation
+                if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+                    console.error(`Installation directory does not exist after MSI installation: ${extractPath}`);
+                    throw new Error(`MSI installation succeeded but directory was not created at ${extractPath}`);
+                }
             }
             if (!shouldCheckIfToolsInstalled()) {
                 //tool for locating installations Where the installation is already in place
@@ -5403,7 +5425,18 @@ function extractAndValidateApiKey() {
 const getConfigFilePath = async (pkcs11FileName, extractPath) => {
     const configFilePath = path_1.default.join(extractPath, "pkcs11properties.cfg");
     console.info("The pkcs11 library path set is ", path_1.default.join(extractPath, pkcs11FileName), "and config file path is ", configFilePath);
-    fs_1.default.writeFileSync(configFilePath, `name=signingmanager\r\nlibrary=${path_1.default.join(extractPath, pkcs11FileName)}\r\nslotListIndex=0`);
+    // Verify the directory exists before attempting to write the config file
+    if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+        console.error(`Cannot create config file: directory does not exist at ${extractPath}`);
+        throw new Error(`Configuration failed: installation directory not found at ${extractPath}`);
+    }
+    // Verify the pkcs11 library file exists
+    const pkcs11LibPath = path_1.default.join(extractPath, pkcs11FileName);
+    if (!(0, fileSystemUtils_1.isFileExistSync)(pkcs11LibPath)) {
+        console.error(`PKCS11 library file not found at ${pkcs11LibPath}. MSI installation may have failed or installed to a different location.`);
+        throw new Error(`PKCS11 library file not found at ${pkcs11LibPath}`);
+    }
+    fs_1.default.writeFileSync(configFilePath, `name=signingmanager\r\nlibrary=${pkcs11LibPath}\r\nslotListIndex=0`);
     return configFilePath;
 };
 exports.getConfigFilePath = getConfigFilePath;
