@@ -4892,6 +4892,28 @@ const checkInstallerTobeDownloaded = (tempDirectoryPath, toolToBeUsed) => {
     }
     return downloadFlag;
 };
+// Fallback function to find MSI installation in common locations
+async function findInstallationPath(tempDirectoryPath, toolToBeUsed) {
+    const fs = __nccwpck_require__(7147);
+    // Common installation paths for DigiCert tools
+    const commonPaths = [
+        path_1.default.join(process.env.ProgramFiles || "C:\\Program Files", "DigiCert", "DigiCert One Signing Manager Tools"),
+        path_1.default.join(process.env["ProgramFiles(x86)"] || "C:\\Program Files (x86)", "DigiCert", "DigiCert One Signing Manager Tools"),
+        path_1.default.join(process.env.LOCALAPPDATA || "", "DigiCert", "DigiCert One Signing Manager Tools"),
+        path_1.default.join(tempDirectoryPath, "DigiCert One Signing Manager Tools"),
+        path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", "")),
+    ];
+    console.log("Searching for installation in common paths...");
+    for (const commonPath of commonPaths) {
+        if (commonPath && (0, fileSystemUtils_1.isFileExistSync)(commonPath)) {
+            console.log(`Found installation at: ${commonPath}`);
+            return commonPath;
+        }
+    }
+    console.error("Could not find installation in any common paths");
+    console.log("Searched paths:", commonPaths.filter(p => p));
+    throw new Error("MSI installed successfully but could not locate installation directory. Please check Windows Programs list for 'DigiCert One Signing Manager Tools'.");
+}
 async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed) {
     let extractPath = "";
     if (tl.getVariable(utils_1.appConst.VAR_FORCE_INSTALL_TOOL) === "true") {
@@ -4900,55 +4922,63 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
             //checking for .msi files
             if (toolToBeUsed.includes(".msi")) {
                 console.log(`Force installing the tool : ${toolToBeUsed}`);
-                extractPath = path_1.default.join(tempDirectoryPath, toolToBeUsed.replace(".msi", ""));
-                // Create the installation directory before running msiexec
-                // MSI may require the directory to exist beforehand
-                if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
-                    console.log(`Creating installation directory: ${extractPath}`);
-                    const { generateDirectory } = __nccwpck_require__(7755);
-                    const result = generateDirectory(extractPath, "MSI Installation");
-                    if (result === "false") {
-                        throw new Error(`Failed to create installation directory at ${extractPath}`);
-                    }
-                }
-                //tool to run .msi file
+                // Let MSI install to its default location (don't use INSTALLDIR)
+                // Many MSIs have hardcoded paths and don't support custom install directories
+                console.log("Installing MSI to default location (MSI may not support custom paths)");
+                //tool to run .msi file - removed INSTALLDIR parameter
                 const msiRunner = tl
                     .tool("msiexec")
                     .arg([
                     `/i`,
                     `${tempDirectoryPath}\\${toolToBeUsed}`,
                     "/quiet",
-                    `INSTALLDIR=${extractPath}`,
+                    "/norestart"
                 ]);
                 const regReturnCode = await msiRunner.exec();
                 //Please provide admin privileges if the regReturnCode is 1625-30
                 if (regReturnCode != 0) {
                     console.error(`MSI installation failed with exit code ${regReturnCode}.`);
-                    console.error(`Common causes: insufficient permissions, conflicting installations, or unsupported INSTALLDIR parameter.`);
+                    console.error(`Common causes: insufficient permissions (try running as administrator), conflicting installations, or corrupted MSI file.`);
                     throw new Error(`Installation of msi failed with return code ${regReturnCode}`);
                 }
-                console.log("installation of smctl returned code", regReturnCode);
-                // Verify the installation directory exists and has content after MSI installation
-                if (!(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
-                    console.error(`Installation directory does not exist after MSI installation: ${extractPath}`);
-                    throw new Error(`MSI installation succeeded but directory was not created at ${extractPath}`);
+                console.log("MSI installation completed successfully with code", regReturnCode);
+                // Query the actual installation location from Windows registry
+                console.log("Querying actual installation location using wmic...");
+                try {
+                    const installationLocation = tl
+                        .tool("wmic")
+                        .arg([
+                        "product",
+                        "where",
+                        "Vendor='DigiCert Inc.' and name='DigiCert One Signing Manager Tools'",
+                        "get",
+                        "installlocation",
+                        "/format:list",
+                    ])
+                        .execSync();
+                    const { stdout } = installationLocation;
+                    if (stdout && stdout.includes("=")) {
+                        extractPath = stdout.split("=")[1].trim();
+                        console.log(`Found installation at: ${extractPath}`);
+                    }
+                    else {
+                        console.warn("wmic query returned no valid installation location");
+                        console.log("wmic output:", stdout);
+                        // Fallback to common installation paths
+                        extractPath = await findInstallationPath(tempDirectoryPath, toolToBeUsed);
+                    }
                 }
-            }
-            if (!shouldCheckIfToolsInstalled()) {
-                //tool for locating installations Where the installation is already in place
-                const installationLocation = tl
-                    .tool("wmic")
-                    .arg([
-                    "product",
-                    "where",
-                    "Vendor='DigiCert Inc.' and name='DigiCert One Signing Manager Tools'",
-                    "get",
-                    "installlocation",
-                    "/format:list",
-                ])
-                    .execSync();
-                const { stdout } = installationLocation;
-                extractPath = stdout.split("=")[1].trim();
+                catch (wmicError) {
+                    console.warn("Failed to query installation location with wmic:", wmicError);
+                    // Fallback to common installation paths
+                    extractPath = await findInstallationPath(tempDirectoryPath, toolToBeUsed);
+                }
+                // Verify the installation directory exists
+                if (!extractPath || !(0, fileSystemUtils_1.isFileExistSync)(extractPath)) {
+                    console.error(`Installation directory not found after MSI installation: ${extractPath}`);
+                    throw new Error(`MSI installation succeeded but could not locate installation directory`);
+                }
+                console.log(`Verified installation directory exists at: ${extractPath}`);
             }
             const downloadToolHash = await (0, fileSystemUtils_1.getFileChecksum)(clientToolsDownloadPath);
             (0, fileSystemUtils_1.writeFileWithContent)(path_1.default.join(tempDirectoryPath, utils_1.appConst.HASH_FILE_NAME), (0, utils_1.getLocalFileName)(toolToBeUsed), `${(0, utils_1.getLocalFileName)(toolToBeUsed)}=${downloadToolHash}\r\n`);
