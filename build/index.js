@@ -32081,7 +32081,14 @@ const toolInstaller = async (toolName, toolPath = "") => {
                 core.debug(err);
                 throw new Error(`failed to download Mage v: ${err.message}`);
             }
-            // Extract tar
+            // On Windows, PowerShell 5.1's Expand-Archive requires a .zip extension.
+            // tc.downloadTool() saves to a temp GUID filename without extension,
+            // so rename it before extracting.
+            if (isWinPlatform && !downloadPath.endsWith(".zip")) {
+                const zipPath = downloadPath + ".zip";
+                fs_1.default.renameSync(downloadPath, zipPath);
+                downloadPath = zipPath;
+            }
             const extractPath = isWinPlatform
                 ? await tc.extractZip(downloadPath)
                 : await tc.extractTar(downloadPath);
