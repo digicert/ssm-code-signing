@@ -32013,9 +32013,17 @@ const toolInstaller = async (toolName, toolPath = "") => {
     let cacheDir;
     switch (toolName) {
         case con.SIGN_TOOL_SMCTL: {
-            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-            core.addPath(cacheDir);
-            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+            // On Windows, MSI installations provide a directory path that's already extracted
+            // Skip caching and use the path directly to avoid "not a supported archive" error
+            if (isWinPlatform && toolPath) {
+                core.addPath(toolPath);
+                core.debug(`Added MSI installation path to PATH: ${toolPath}`);
+            }
+            else {
+                cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+                core.addPath(cacheDir);
+                core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+            }
             break;
         }
         case con.SIGN_TOOL_SIGNTOOL: {
@@ -32038,9 +32046,17 @@ const toolInstaller = async (toolName, toolPath = "") => {
             break;
         }
         case con.SIGN_TOOL_SSM_SCD: {
-            cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-            core.addPath(cacheDir);
-            core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+            // On Windows, MSI installations provide a directory path that's already extracted
+            // Skip caching and use the path directly to avoid "not a supported archive" error
+            if (isWinPlatform && toolPath) {
+                core.addPath(toolPath);
+                core.debug(`Added MSI installation path to PATH: ${toolPath}`);
+            }
+            else {
+                cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+                core.addPath(cacheDir);
+                core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+            }
             break;
         }
         case con.SIGN_TOOL_NUGET: {
