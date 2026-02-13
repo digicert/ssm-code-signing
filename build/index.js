@@ -4833,11 +4833,13 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
                         error.code === "ELOCKED") {
                         console.log(`File ${tempDirectoryPath} is currently locked. Retrying in a moment...`);
                         // Implement a retry mechanism (e.g., using setTimeout or a retry library)
-                        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 1 second
+                        await new Promise((resolve) => setTimeout(resolve, 5000)); // Wait 5 seconds
                         extractPath = await processExtract(clientToolsDownloadPath, tempDirectoryPath, toolToBeUsed[i]); // Retry the operation
                     }
                     else {
                         console.error(`Error processing file ${tempDirectoryPath}:`, error);
+                        // Re-throw the error so it's not silently swallowed
+                        throw error;
                     }
                 }
             }
@@ -4848,11 +4850,17 @@ async function runWinToolBasedInstallationOrExtraction(toolToBeUsed, tempDirecto
     }
     catch (error) {
         console.error(`Error processing file ${tempDirectoryPath}:`, error);
-    }
-    finally {
-        // Release lock from the tempDirectory
+        // Re-throw the error after releasing the lock
         await lockfile.unlock(tempDirectoryPath);
         console.log(`Lock released for ${tempDirectoryPath}.`);
+        throw error;
+    }
+    finally {
+        // Release lock from the tempDirectory if not already released
+        if (await lockfile.check(tempDirectoryPath)) {
+            await lockfile.unlock(tempDirectoryPath);
+            console.log(`Lock released for ${tempDirectoryPath}.`);
+        }
     }
     return extractPath;
 }
@@ -4922,6 +4930,46 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
             //checking for .msi files
             if (toolToBeUsed.includes(".msi")) {
                 console.log(`Force installing the tool : ${toolToBeUsed}`);
+                // Check if there's an existing installation and try to uninstall it first
+                console.log("Checking for existing installations...");
+                try {
+                    const checkInstall = tl
+                        .tool("wmic")
+                        .arg([
+                        "product",
+                        "where",
+                        "name='DigiCert One Signing Manager Tools'",
+                        "get",
+                        "name,version"
+                    ])
+                        .execSync();
+                    if (checkInstall.stdout && checkInstall.stdout.includes("DigiCert")) {
+                        console.log("Existing installation found. Attempting to uninstall...");
+                        const uninstallRunner = tl
+                            .tool("msiexec")
+                            .arg([
+                            `/x`,
+                            `${tempDirectoryPath}\\${toolToBeUsed}`,
+                            "/quiet",
+                            "/norestart"
+                        ]);
+                        const uninstallCode = await uninstallRunner.exec();
+                        if (uninstallCode === 0) {
+                            console.log("Previous installation uninstalled successfully");
+                            // Wait a bit for Windows Installer to clean up
+                            await new Promise((resolve) => setTimeout(resolve, 3000));
+                        }
+                        else {
+                            console.warn(`Uninstall returned code ${uninstallCode}, continuing with installation...`);
+                        }
+                    }
+                    else {
+                        console.log("No existing installation found.");
+                    }
+                }
+                catch (checkError) {
+                    console.log("Could not check for existing installation, continuing...");
+                }
                 // Let MSI install to its default location (don't use INSTALLDIR)
                 // Many MSIs have hardcoded paths and don't support custom install directories
                 console.log("Installing MSI to default location (MSI may not support custom paths)");
@@ -4996,6 +5044,8 @@ async function processExtract(clientToolsDownloadPath, tempDirectoryPath, toolTo
             }
             else {
                 console.error(`Error processing file ${tempDirectoryPath}:`, error);
+                // Re-throw the error to propagate it up
+                throw error;
             }
         }
     }
