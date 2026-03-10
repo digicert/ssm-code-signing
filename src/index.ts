@@ -16,13 +16,20 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
   let cacheDir;
   switch (toolName) {
     case con.SIGN_TOOL_SMCTL: {
-      cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-      core.addPath(cacheDir);
-      core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+      // On Windows, MSI installations provide a directory path that's already extracted
+      // Skip caching and use the path directly to avoid "not a supported archive" error
+      if (isWinPlatform && toolPath) {
+        core.addPath(toolPath);
+        core.debug(`Added MSI installation path to PATH: ${toolPath}`);
+      } else {
+        cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+        core.addPath(cacheDir);
+        core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+      }
       break;
     }
     case con.SIGN_TOOL_SIGNTOOL: {
-      var sign = ""; 
+      var sign = "";
       if (fs.existsSync(con.WIN_KIT_BASE_PATH)) {
         console.log(`The WinKit directory exists!`);
         let versions = utils.getAllSdkVersions(con.WIN_KIT_BASE_PATH, new Array());
@@ -32,7 +39,7 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
         console.log(`Latest Win SDK Version is : `, versions[latestSdkVerIdx]);
         console.log(`Using the latest Win SDK version ${versions[latestSdkVerIdx]} for signing!`);
         sign = con.WIN_KIT_BASE_PATH + versions[latestSdkVerIdx] + con.ARCH_TYPE_DIR;
-        
+
         cacheDir = await tc.cacheDir(sign, toolName, "latest");
         core.addPath(cacheDir);
         core.debug(`tools cache has been updated with the path: ${cacheDir}`);
@@ -42,9 +49,16 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
       break;
     }
     case con.SIGN_TOOL_SSM_SCD: {
-      cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
-      core.addPath(cacheDir);
-      core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+      // On Windows, MSI installations provide a directory path that's already extracted
+      // Skip caching and use the path directly to avoid "not a supported archive" error
+      if (isWinPlatform && toolPath) {
+        core.addPath(toolPath);
+        core.debug(`Added MSI installation path to PATH: ${toolPath}`);
+      } else {
+        cacheDir = await tc.cacheDir(toolPath, toolName, "latest");
+        core.addPath(cacheDir);
+        core.debug(`tools cache has been updated with the path: ${cacheDir}`);
+      }
       break;
     }
     case con.SIGN_TOOL_NUGET: {
@@ -70,10 +84,17 @@ const toolInstaller = async (toolName: string, toolPath: string = "") => {
 
         throw new Error(`failed to download Mage v: ${err.message}`);
       }
-      // Extract tar
+      // On Windows, PowerShell 5.1's Expand-Archive requires a .zip extension.
+      // tc.downloadTool() saves to a temp GUID filename without extension,
+      // so rename it before extracting.
+      if (isWinPlatform && !downloadPath.endsWith(".zip")) {
+        const zipPath = downloadPath + ".zip";
+        fs.renameSync(downloadPath, zipPath);
+        downloadPath = zipPath;
+      }
       const extractPath = isWinPlatform
-          ? await tc.extractZip(downloadPath)
-          : await tc.extractTar(downloadPath);
+        ? await tc.extractZip(downloadPath)
+        : await tc.extractTar(downloadPath);
       cacheDir = await tc.cacheDir(extractPath, toolName, "latest");
       core.addPath(cacheDir);
       core.debug(`tools cache has been updated with the path: ${cacheDir}`);
