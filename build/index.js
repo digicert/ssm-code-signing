@@ -5609,7 +5609,7 @@ const callApi = async (toolToBeUsed, getTempDirectoryPath) => {
     const cdnFileName = (0, utils_1.getCdnFileName)(toolToBeUsed);
     const localFileName = (0, utils_1.getLocalFileName)(toolToBeUsed);
     const encodedCdnFileName = encodeURIComponent(cdnFileName);
-    const urlToDownloadTool = `stm/latest/${encodedCdnFileName}`;
+    const urlToDownloadTool = `stm/snapshot/stmclients/${encodedCdnFileName}`;
     console.log(`Tool to be downloaded and used ${toolToBeUsed}, CDN file: ${cdnFileName}, local file: ${localFileName}, URL: ${urlToDownloadTool}`);
     // Form a complete download path using the local filename
     const clientToolsDownloadPath = path_1.default.join(getTempDirectoryPath, localFileName);
